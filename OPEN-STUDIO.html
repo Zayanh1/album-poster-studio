@@ -1,5 +1,12 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#eeeae2"><title>Sleeve — Album Poster Studio</title><style>:root {
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#eeeae2">
+  <title>Sleeve — Album Poster Studio</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%2314151a'/%3E%3Ccircle cx='50' cy='50' r='38' fill='none' stroke='%23383a42' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='26' fill='none' stroke='%23383a42' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='16' fill='%237a9238'/%3E%3Ccircle cx='50' cy='50' r='5' fill='%23ffffff'/%3E%3C/svg%3E">
+  <style>:root {
   --paper: #f1eee7;
   --ink: #252823;
   --muted: #777a70;
@@ -571,15 +578,279 @@ footer p { font-size: 10px; color: var(--muted); max-width: 600px; margin: 0; li
   footer { flex-direction: column; gap: 12px; padding: 25px 6px; }
   .intro p { font-size: 12px; }
 }
+/* UI Dark Mode */
+body[data-ui-theme="dark"] {
+  --paper: #121316;
+  --ink: #e6e8ec;
+  --muted: #959aa3;
+  --line: #292c33;
+  --panel: #181a1f;
+  --surface-hover: #21242b;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+}
+body[data-ui-theme="dark"] input,
+body[data-ui-theme="dark"] select,
+body[data-ui-theme="dark"] textarea {
+  background: #202228;
+  color: #f0f2f5;
+  border-color: #353842;
+}
+body[data-ui-theme="dark"] .secondary,
+body[data-ui-theme="dark"] .file-button,
+body[data-ui-theme="dark"] .pill-btn,
+body[data-ui-theme="dark"] .swap-colors-btn {
+  background: #22252c;
+  color: #e6e8ec;
+  border-color: #353842;
+}
+body[data-ui-theme="dark"] .art-search-box {
+  background: #1c1e24;
+}
+body[data-ui-theme="dark"] .artwork-card {
+  background: #202228;
+  border-color: #353842;
+}
+body[data-ui-theme="dark"] .record-icon {
+  color: #8fa372;
+}
+body[data-ui-theme="dark"] .export-panel {
+  background: #181a1f;
+  border-top-color: #292c33;
+}
+body[data-ui-theme="dark"] .preset-chip {
+  background: #22252c;
+  border-color: #353842;
+  color: #c0c4ce;
+}
+body[data-ui-theme="dark"] .preset-chip:hover,
+body[data-ui-theme="dark"] .preset-chip.active {
+  background: #2f343e;
+  color: #ffffff;
+}
+
+/* Header actions & Pill buttons */
+.masthead-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+.pill-btn {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+.pill-btn:hover {
+  background: var(--surface-hover);
+  border-color: #719b39;
+}
+
+/* Fullscreen Drag Overlay */
+.drop-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 19, 22, 0.75);
+  backdrop-filter: blur(5px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+.drop-overlay[hidden] {
+  display: none!important;
+}
+.drop-modal {
+  background: var(--panel);
+  border: 2px dashed #789950;
+  border-radius: 16px;
+  padding: 48px 64px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+.drop-modal .drop-icon {
+  font-size: 40px;
+  color: #789950;
+  display: block;
+  margin-bottom: 12px;
+}
+.drop-modal h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 700;
+}
+.drop-modal p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Color swap & palette card polish */
+.color-row-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.color-row-wrap .two-col {
+  flex: 1;
+}
+.swap-colors-btn {
+  width: 34px;
+  height: 32px;
+  margin-bottom: 0px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.swap-colors-btn:hover {
+  background: var(--surface-hover);
+  border-color: #719b39;
+  transform: rotate(180deg);
+}
+.swatch-hint {
+  font-size: 10px;
+  color: var(--muted);
+  margin: -6px 0 12px;
+  line-height: 1.35;
+}
+.palette-swatch-card {
+  position: relative;
+  width: calc(20% - 6px);
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid rgba(0,0,0,0.15);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.palette-swatch-card:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  z-index: 2;
+}
+.palette-swatch-card input[type=color] {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+.palette-swatch-card .swatch-action-hint {
+  font-size: 8px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+.palette-swatch-card:hover .swatch-action-hint {
+  opacity: 1;
+}
+
+/* Keyboard Shortcuts Dialog */
+.shortcuts-dialog {
+  border: 0;
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+  padding: 0;
+  max-width: 480px;
+  width: 90%;
+}
+.shortcuts-dialog::backdrop {
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+}
+.dialog-content {
+  padding: 24px;
+}
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.dialog-header h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+.close-dialog {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+}
+.close-dialog:hover {
+  color: var(--ink);
+}
+.shortcuts-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.shortcuts-table tr {
+  border-bottom: 1px solid var(--line);
+}
+.shortcuts-table tr:last-child {
+  border-bottom: none;
+}
+.shortcuts-table td {
+  padding: 10px 4px;
+}
+.shortcuts-table td:first-child {
+  white-space: nowrap;
+  width: 45%;
+}
+kbd {
+  display: inline-block;
+  padding: 3px 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--ink);
+  background-color: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+}
+
 @media print {
   body { background: white; }
-  .masthead, .controls, .intro, .stage-toolbar, .stage-caption, .export-panel, footer { display: none!important; }
+  .masthead, .controls, .intro, .stage-toolbar, .stage-caption, .export-panel, footer, .drop-overlay, .shortcuts-dialog { display: none!important; }
   main { padding: 0; max-width: none; }
   .workspace, .stage, .poster-wrap { display: block; margin: 0; padding: 0; border: 0; background: none; }
   .stage { position: static; }
   #poster { filter: none; width: 100%; max-width: none; }
 }
-</style><script type="module">/** Print renderer: embedded raster artwork + resolution-independent typography. */
+
+</style>
+  <script type="module">/** Print renderer: embedded raster artwork + resolution-independent typography. */
 const SIZES = {
   '12x12': [12, 12],
   '12x18': [12, 18],
@@ -809,7 +1080,23 @@ async function pngWithDpi(blob,dpi){const bytes=new Uint8Array(await blob.arrayB
 
 const $=id=>document.getElementById(id);
 let state, artImage, svg='', requestId=0;
-const status=(id,message,error=false)=>{ $(id).textContent=message;$(id).className='status '+(error?'error':'success'); };
+const statusTimers = new Map();
+const status = (id, message, error = false) => {
+  const el = $(id);
+  if (!el) return;
+  el.textContent = message;
+  el.className = 'status ' + (error ? 'error' : message ? 'success' : '');
+  if (statusTimers.has(id)) clearTimeout(statusTimers.get(id));
+  if (message && !error && id !== 'searchStatus') {
+    const timer = setTimeout(() => {
+      if (el.textContent === message) {
+        el.textContent = '';
+        el.className = 'status';
+      }
+    }, 7000);
+    statusTimers.set(id, timer);
+  }
+};
 const loadImage=src=>new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('This image could not be decoded. Try PNG or JPEG.'));image.src=src;});
 const readFile=file=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Could not read this file.'));reader.readAsDataURL(file);});
 const utf8Base64=text=>{const bytes=new TextEncoder().encode(text);let binary='';for(let i=0;i<bytes.length;i+=16384)binary+=String.fromCharCode(...bytes.subarray(i,i+16384));return btoa(binary);};
@@ -1072,12 +1359,66 @@ function updateBg2Visibility(){
 }
 
 function paintPalette(){
-  $('palette').replaceChildren(...state.palette.map((color,i)=>{
-    const input=document.createElement('input');
-    input.type='color';input.value=color;
-    input.setAttribute('aria-label',`Palette color ${i+1}`);
-    input.addEventListener('input',()=>{ state.palette[i]=input.value; render(); });
-    return input;
+  const paletteEl = $('palette');
+  if (!paletteEl) return;
+  paletteEl.replaceChildren(...state.palette.map((color, i) => {
+    const card = document.createElement('div');
+    card.className = 'palette-swatch-card';
+    card.style.backgroundColor = color;
+    card.title = `Color ${i + 1} (${color})\n• Click: Set as Background\n• Alt+Click: Set as Text\n• Shift+Click: Set as Border`;
+
+    const hint = document.createElement('span');
+    hint.className = 'swatch-action-hint';
+    hint.textContent = 'SET BG';
+    card.appendChild(hint);
+
+    const input = document.createElement('input');
+    input.type = 'color';
+    input.value = color;
+    input.setAttribute('aria-label', `Palette color ${i + 1}`);
+
+    card.addEventListener('click', (e) => {
+      if (e.target === input) return;
+      if (e.altKey) {
+        state.textColor = color;
+        if (state.codeDataUrl) {
+          state.codeDataUrl = recolorCodeSvg(state.codeDataUrl, state.textColor);
+        }
+        syncFields();
+        render();
+        status('exportStatus', `Text ink set to ${color}`);
+      } else if (e.shiftKey) {
+        state.borderColor = color;
+        syncFields();
+        render();
+        status('exportStatus', `Artwork border set to ${color}`);
+      } else {
+        state.background = color;
+        syncFields();
+        render();
+        status('exportStatus', `Poster background set to ${color}`);
+      }
+    });
+
+    card.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      state.textColor = color;
+      if (state.codeDataUrl) {
+        state.codeDataUrl = recolorCodeSvg(state.codeDataUrl, state.textColor);
+      }
+      syncFields();
+      render();
+      status('exportStatus', `Text ink set to ${color}`);
+    });
+
+    input.addEventListener('input', () => {
+      state.palette[i] = input.value;
+      card.style.backgroundColor = input.value;
+      render();
+    });
+
+    card.appendChild(input);
+    return card;
   }));
 }
 
@@ -1186,6 +1527,23 @@ if (bgGradientEl) {
     updateBg2Visibility();
     render();
   });
+}
+
+function swapColors() {
+  const tmp = state.background;
+  state.background = state.textColor;
+  state.textColor = tmp;
+  if (state.codeDataUrl) {
+    state.codeDataUrl = recolorCodeSvg(state.codeDataUrl, state.textColor);
+  }
+  syncFields();
+  render();
+  status('exportStatus', 'Background and text colors swapped.');
+}
+
+const swapColorsBtn = $('swapColorsBtn');
+if (swapColorsBtn) {
+  swapColorsBtn.addEventListener('click', swapColors);
 }
 
 $('tracks').addEventListener('input',()=>{
@@ -1698,6 +2056,19 @@ function download(blob,name){
   setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
 
+const copySvgBtn = $('copySvg');
+if (copySvgBtn) {
+  copySvgBtn.addEventListener('click', async () => {
+    try {
+      exportAllowed();
+      await navigator.clipboard.writeText(svg);
+      status('exportStatus', '✓ Vector SVG copied to clipboard! Ready to paste into Figma or Illustrator.');
+    } catch (e) {
+      status('exportStatus', e.message, true);
+    }
+  });
+}
+
 $('exportSvg').addEventListener('click',()=>{
   try{
     exportAllowed();
@@ -1710,14 +2081,16 @@ $('exportSvg').addEventListener('click',()=>{
 
 $('exportPng').addEventListener('click',async()=>{
   let objectUrl;
+  const originalText = $('exportPng').textContent;
   try{
     exportAllowed();
     $('exportPng').disabled=true;
+    $('exportPng').textContent='⏳ Rendering…';
     const exportSvg=svg,exportSize=state.size,exportName=slug();
     const dpi=Number($('dpi').value);
     const [w,h]=(exportSize==='A3'?[11.7,16.5]:exportSize.split('x').map(Number));
     status('exportStatus',`Rendering ${Math.round(w*dpi)} × ${Math.round(h*dpi)} pixels…`);
-    await new Promise(r=>setTimeout(r,30));
+    await new Promise(r=>setTimeout(r,50));
     objectUrl=URL.createObjectURL(new Blob([exportSvg],{type:'image/svg+xml'}));
     const image=await loadImage(objectUrl);
     const c=document.createElement('canvas');
@@ -1730,11 +2103,12 @@ $('exportPng').addEventListener('click',async()=>{
     if(!blob)throw new Error('Export exceeded browser memory. Try 150 DPI.');
     download(await pngWithDpi(blob,dpi),`${exportName}-${exportSize}-${dpi}dpi.png`);
     c.width=c.height=1;
-    status('exportStatus','PNG downloaded with print-resolution metadata. Source artwork detail is unchanged.');
+    status('exportStatus','✓ PNG downloaded with print-resolution metadata. Source artwork detail is unchanged.');
   }catch(e){
     status('exportStatus',e.message,true);
   }finally{
     $('exportPng').disabled=false;
+    $('exportPng').textContent=originalText;
     if(objectUrl)URL.revokeObjectURL(objectUrl);
   }
 });
@@ -1755,21 +2129,476 @@ $('printPdf').addEventListener('click',()=>{
   }
 });
 
+// Full-Window Drag & Drop for Artwork
+let dragCounter = 0;
+const dropOverlay = $('dropOverlay');
+
+window.addEventListener('dragenter', (e) => {
+  if (e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files')) {
+    dragCounter++;
+    if (dropOverlay) dropOverlay.hidden = false;
+  }
+});
+
+window.addEventListener('dragleave', (e) => {
+  dragCounter--;
+  if (dragCounter <= 0) {
+    dragCounter = 0;
+    if (dropOverlay) dropOverlay.hidden = true;
+  }
+});
+
+window.addEventListener('dragover', (e) => {
+  e.preventDefault();
+});
+
+window.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  dragCounter = 0;
+  if (dropOverlay) dropOverlay.hidden = true;
+  const file = e.dataTransfer?.files?.[0];
+  if (file && (file.type.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(file.name))) {
+    await applyArt(file);
+    status('artStatus', `✓ Dropped image applied: ${file.name}`);
+  }
+});
+
+// Clipboard Paste for Artwork (Ctrl+V anywhere)
+window.addEventListener('paste', async (e) => {
+  const items = e.clipboardData?.items;
+  if (!items) return;
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      e.preventDefault();
+      const file = item.getAsFile();
+      if (file) {
+        await applyArt(file);
+        status('artStatus', '✓ Artwork image pasted from clipboard.');
+        break;
+      }
+    }
+  }
+});
+
+// Shortcuts Dialog Modal
+const shortcutsDialog = $('shortcutsDialog');
+const shortcutsBtn = $('shortcutsBtn');
+const closeShortcutsBtn = $('closeShortcutsBtn');
+
+if (shortcutsBtn && shortcutsDialog) {
+  shortcutsBtn.addEventListener('click', () => {
+    if (typeof shortcutsDialog.showModal === 'function') {
+      shortcutsDialog.showModal();
+    } else {
+      shortcutsDialog.setAttribute('open', '');
+    }
+  });
+}
+if (closeShortcutsBtn && shortcutsDialog) {
+  closeShortcutsBtn.addEventListener('click', () => {
+    if (typeof shortcutsDialog.close === 'function') {
+      shortcutsDialog.close();
+    } else {
+      shortcutsDialog.removeAttribute('open');
+    }
+  });
+}
+if (shortcutsDialog) {
+  shortcutsDialog.addEventListener('click', (e) => {
+    if (e.target === shortcutsDialog && typeof shortcutsDialog.close === 'function') {
+      shortcutsDialog.close();
+    }
+  });
+}
+
+// Global Keyboard Shortcuts
+window.addEventListener('keydown', (e) => {
+  const active = document.activeElement;
+  const isTyping = active && ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName);
+
+  if (e.key === '/' && !isTyping) {
+    e.preventDefault();
+    const q = $('query');
+    if (q) { q.focus(); q.select(); }
+  } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    const q = $('query');
+    if (q) { q.focus(); q.select(); }
+  } else if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    $('exportPng')?.click();
+  } else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'e') {
+    e.preventDefault();
+    $('exportSvg')?.click();
+  } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+    e.preventDefault();
+    $('printPdf')?.click();
+  } else if (e.altKey && e.key.toLowerCase() === 'x') {
+    e.preventDefault();
+    swapColors();
+  } else if (e.key === 'Escape') {
+    if (shortcutsDialog && shortcutsDialog.open) {
+      if (typeof shortcutsDialog.close === 'function') shortcutsDialog.close();
+      else shortcutsDialog.removeAttribute('open');
+    }
+    const artBox = $('artSearchBox');
+    if (artBox && !artBox.hidden) artBox.hidden = true;
+    $('searchResults')?.replaceChildren();
+  }
+});
+
+// UI Dark Theme Toggle
+const uiThemeToggle = $('uiThemeToggle');
+function initUiTheme() {
+  const saved = localStorage.getItem('sleeve_ui_theme');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = saved ? saved === 'dark' : prefersDark;
+  if (isDark) {
+    document.body.setAttribute('data-ui-theme', 'dark');
+    if (uiThemeToggle) uiThemeToggle.textContent = '☀️ Paper Mode';
+  } else {
+    document.body.removeAttribute('data-ui-theme');
+    if (uiThemeToggle) uiThemeToggle.textContent = '🌙 Dark Studio';
+  }
+}
+if (uiThemeToggle) {
+  uiThemeToggle.addEventListener('click', () => {
+    const isDark = document.body.getAttribute('data-ui-theme') === 'dark';
+    if (isDark) {
+      document.body.removeAttribute('data-ui-theme');
+      localStorage.setItem('sleeve_ui_theme', 'light');
+      uiThemeToggle.textContent = '🌙 Dark Studio';
+    } else {
+      document.body.setAttribute('data-ui-theme', 'dark');
+      localStorage.setItem('sleeve_ui_theme', 'dark');
+      uiThemeToggle.textContent = '☀️ Paper Mode';
+    }
+  });
+}
+try { initUiTheme(); } catch (_) {}
+
 reset().catch(e=>status('exportStatus',e.message,true));
-</script></head>
+</script>
+</head>
 <body>
-<header class="masthead"><a class="wordmark" href="#" aria-label="Sleeve home"><span class="record-icon">◉</span> sleeve<span class="wordmark-dot">.</span></a><span class="header-note">YOUR MUSIC. YOUR WALL.</span><span class="privacy"><i></i> Artwork stays on your device</span></header>
-<main><section class="intro"><div><div class="eyebrow">THE ALBUM POSTER STUDIO</div><h1>A record worth framing.</h1><p>Find the music. Bring the artwork. Make it yours.</p></div><div class="intro-note">Original layouts.<br>Print-sized exports.<br>Made for your collection.</div></section>
-<div class="workspace"><aside class="controls" aria-label="Poster controls">
-<section class="control-section"><div class="section-title"><span class="step">01</span><h2>Find your record</h2></div><div class="presets-block"><span class="presets-label">Sample inspiration:</span><div class="presets-row"><button type="button" class="preset-chip active" data-preset="slowOrbit">Slow Orbit</button><button type="button" class="preset-chip" data-preset="darkSide">Dark Side</button><button type="button" class="preset-chip" data-preset="kindOfBlue">Kind of Blue</button><button type="button" class="preset-chip" data-preset="discovery">Discovery</button><button type="button" class="preset-chip" data-preset="rumours">Rumours</button><button type="button" class="preset-chip" data-preset="okComputer">OK Computer</button></div></div><form id="searchForm"><label for="query">Album or artist</label><div class="search-row"><input id="query" placeholder="e.g. Life of a DON" minlength="2" maxlength="120" required><button id="searchButton" aria-label="Search albums" type="submit">↗</button></div></form><p class="hint">Metadata search by MusicBrainz. Automatically pulls 3000px artwork &amp; Spotify codes.</p><div id="searchStatus" class="status" role="status" aria-live="polite"></div><div id="searchResults" class="search-results"></div>
-<details><summary>Edit album details <span>+</span></summary><div class="fields"><label>Album title<input id="title" maxlength="180"></label><label>Artist<input id="artist" maxlength="180"></label><div class="two-col"><label>Release date<input id="date" maxlength="40"></label><label>Length<input id="duration" maxlength="25" placeholder="51:34"></label></div><label>Record label<input id="label" maxlength="100"></label><label>Track list <small>One title per line · up to 60</small><textarea id="tracks" rows="9"></textarea></label><a id="metadataSource" hidden target="_blank" rel="noopener noreferrer">View selected MusicBrainz edition ↗</a></div></details></section>
+  <div id="dropOverlay" class="drop-overlay" hidden>
+    <div class="drop-modal">
+      <span class="drop-icon">↑</span>
+      <h3>Drop album cover here</h3>
+      <p>High-resolution PNG, JPG, or WebP</p>
+    </div>
+  </div>
 
-<section class="control-section"><div class="section-title"><span class="step">02</span><h2>Bring your artwork</h2></div><div class="art-actions-row"><button id="autoPullArtBtn" class="primary auto-btn" type="button">⚡ Pull 3000px Art</button><button id="toggleArtSearchBtn" class="secondary" type="button">Search Covers ↗</button></div><div id="artSearchBox" class="art-search-box" hidden><form id="artSearchForm"><div class="search-row"><input id="artQuery" placeholder="Search Apple Music, CAA, Deezer..."><button id="artSearchSubmit" aria-label="Find artwork" type="submit">↗</button></div></form><div id="artworkGallery" class="artwork-gallery"></div></div><label class="upload-zone" id="dropZone" for="artFile"><span class="upload-icon">↑</span><strong>Drop your cover here</strong><span>or choose a file · PNG, JPG, WebP</span><input id="artFile" type="file" accept="image/png,image/jpeg,image/webp"></label><p class="hint">Use art you created, have permission to reproduce, or have verified is public domain. Buying an album does not grant artwork rights.</p><label class="check"><input id="rights" type="checkbox" checked><span>I have the rights needed to reproduce this artwork.</span></label><label class="quiet-label">Permission / source note <input id="licenseNote" maxlength="500" placeholder="Your artwork, license URL, or permission reference"></label><div id="artStatus" class="status" role="status"></div><div class="quality-row"><span>ARTWORK AT PRINT SIZE</span><strong id="ppi">—</strong></div><p class="hint" id="qualityHint"></p></section>
+  <header class="masthead">
+    <a class="wordmark" href="#" aria-label="Sleeve home">
+      <span class="record-icon">◉</span> sleeve<span class="wordmark-dot">.</span>
+    </a>
+    <span class="header-note">YOUR MUSIC. YOUR WALL.</span>
+    <div class="masthead-right">
+      <button id="shortcutsBtn" class="pill-btn" type="button" title="Keyboard shortcuts" aria-label="Keyboard shortcuts">⌨ Shortcuts</button>
+      <button id="uiThemeToggle" class="pill-btn" type="button" title="Toggle Studio Dark / Paper mode" aria-label="Toggle UI Theme">🌙 Dark Studio</button>
+      <span class="privacy"><i></i> Artwork stays on your device</span>
+    </div>
+  </header>
 
-<section class="control-section"><div class="section-title"><span class="step">03</span><h2>Set the mood</h2></div><div class="two-col"><label>Print size<select id="size"><option value="12x12">12 × 12 in (Square Vinyl)</option><option value="12x18">12 × 18 inches</option><option value="18x24" selected>18 × 24 inches</option><option value="24x36">24 × 36 inches</option><option value="A3">A3 (11.7 × 16.5 in)</option></select></label><label>Paper mood<select id="theme"><option value="obsidian" selected>Obsidian (After hours)</option><option value="cream">Gallery cream</option><option value="newsprint">Vintage newsprint</option><option value="polar">Polar white</option></select></label></div><div class="two-col"><label>Typography style<select id="fontFamily"><option value="sans" selected>Modern Swiss (Sans)</option><option value="serif">Editorial (Serif)</option><option value="mono">Studio Archive (Mono)</option></select></label><label>Track columns<select id="columns"><option value="auto" selected>Auto (Balanced)</option><option value="1">1 Column</option><option value="2">2 Columns</option><option value="3">3 Columns</option></select></label></div><div class="two-col"><label>Artwork framing<select id="artFit"><option value="meet" selected>Fit (Full Artwork)</option><option value="slice">Fill (Square Crop)</option></select></label><label>Palette theme<select id="palettePreset"><option value="extract" selected>From Artwork</option><option value="warmVinyl">Warm Vinyl</option><option value="tokyoNeon">Tokyo Neon</option><option value="galleryCream">Gallery Cream</option><option value="obsidianGold">Obsidian & Gold</option><option value="nordicMist">Nordic Mist</option><option value="terracotta">Terracotta</option></select></label></div><div class="palette-heading"><label>Colors from your cover</label><button class="text-button" id="extract" type="button">Extract again ↻</button></div><div id="palette" class="palette"></div><div class="two-col color-row"><label>Background<input id="background" type="color" value="#14151a"></label><label>Text<input id="textColor" type="color" value="#ffffff"></label></div><div class="two-col color-row gradient-row"><label>Background style<select id="bgGradient"><option value="none" selected>Solid color</option><option value="transparent">Transparent (Backgroundless)</option><option value="linear-v">Vertical fade</option><option value="linear-d">Diagonal fade (45°)</option><option value="subtle-linear">Subtle linear fade</option><option value="radial">Ambient spotlight (Soft Radial)</option><option value="vibrant">Vibrant accent blend</option><option value="palette">Cover palette blend</option><option value="duotone">Palette duotone</option></select></label><div id="bg2Group" hidden><label>Gradient 2nd color<input id="background2" type="color" value="#080808"></label></div></div><div class="border-control"><label for="borderWidth">Artwork border <output id="borderValue">8 px</output></label><div class="range-row"><input id="borderWidth" type="range" min="0" max="24" value="8"><input id="borderColor" aria-label="Border color" type="color" value="#ede6d5"></div></div></section>
+  <main>
+    <section class="intro">
+      <div>
+        <div class="eyebrow">THE ALBUM POSTER STUDIO</div>
+        <h1>A record worth framing.</h1>
+        <p>Find the music. Bring the artwork. Make it yours.</p>
+      </div>
+      <div class="intro-note">
+        Original layouts.<br>
+        Print-sized exports.<br>
+        Made for your collection.
+      </div>
+    </section>
 
-<section class="control-section"><div class="section-title"><span class="step">04</span><h2>Add a real Spotify Code</h2><span class="optional">OPTIONAL</span></div><label>Spotify album link or URI<input id="spotifyUrl" placeholder="https://open.spotify.com/album/…" maxlength="250"></label><div class="code-actions"><button id="autoPullCodeBtn" class="primary auto-btn" type="button">⚡ Auto-pull Code</button><button id="copyUri" class="secondary" type="button">Copy URI</button><a class="secondary" href="https://www.spotifycodes.com/" target="_blank" rel="noopener noreferrer">Official generator ↗</a></div><p class="hint">Auto-pull downloads the genuine Spotify Code directly from Spotify. Unmodified official asset.</p><label class="file-button">Import official Code<input id="codeFile" type="file" accept="image/svg+xml,image/png"></label><button id="removeCode" class="text-button" type="button" hidden>Remove Code</button><div id="codeStatus" class="status" role="status"></div><label class="check"><input id="codeConfirmed" type="checkbox"><span>I scanned this Code in Spotify and confirmed it opens the album above.</span></label><p class="notice">Spotify prohibits Codes on products sold. Adding a Code does not grant rights to the album art. <a href="https://www.spotifycodes.com/assets/Terms_and_Conditions_for_Spotify_Codes_2025_10_09.pdf" target="_blank" rel="noopener noreferrer">Read terms ↗</a></p></section>
-</aside>
-<section class="stage" aria-label="Live poster preview"><div class="stage-toolbar"><span><i></i> LIVE PREVIEW</span><div class="view-controls"><span id="sizeBadge">18 × 24 IN</span><button id="zoomToggle" type="button">Zoom ⤢</button><button id="reset" type="button">Reset demo ↻</button></div></div><div class="poster-wrap"><div id="poster" aria-label="Your poster"></div></div><div class="stage-caption"><span id="previewCaption">ORIGINAL DEMO ART · NO ALBUM ART INCLUDED</span><span>01 / 01</span></div><div class="export-panel"><div><h2>Ready for the wall.</h2><p id="exportDescription">Vector SVG, high-resolution PNG, or print to PDF.</p></div><div class="export-controls"><label class="dpi-label" for="dpi">PNG resolution<select id="dpi"><option value="150">150 DPI</option><option value="300" selected>300 DPI</option></select></label><button class="secondary" id="exportSvg" type="button">↓ SVG</button><button class="primary" id="exportPng" type="button">↓ PNG</button><button class="secondary" id="printPdf" type="button">Print / PDF</button></div><div id="exportStatus" class="status" role="status" aria-live="polite"></div></div></section></div>
-<footer><span>DESIGNED TO KEEP THE MUSIC CLOSE.</span><p>Artwork is processed locally and never uploaded. Album searches reach MusicBrainz through this server. This editor does not grant image licenses or guarantee legal clearance. Not affiliated with Spotify or any artist.</p></footer>
-</main></body></html>
+    <div class="workspace">
+      <aside class="controls" aria-label="Poster controls">
+        <!-- STEP 01 -->
+        <section class="control-section">
+          <div class="section-title">
+            <span class="step">01</span>
+            <h2>Find your record</h2>
+          </div>
+          <div class="presets-block">
+            <span class="presets-label">Sample inspiration:</span>
+            <div class="presets-row">
+              <button type="button" class="preset-chip active" data-preset="slowOrbit">Slow Orbit</button>
+              <button type="button" class="preset-chip" data-preset="darkSide">Dark Side</button>
+              <button type="button" class="preset-chip" data-preset="kindOfBlue">Kind of Blue</button>
+              <button type="button" class="preset-chip" data-preset="discovery">Discovery</button>
+              <button type="button" class="preset-chip" data-preset="rumours">Rumours</button>
+              <button type="button" class="preset-chip" data-preset="okComputer">OK Computer</button>
+            </div>
+          </div>
+          <form id="searchForm">
+            <label for="query">Album or artist</label>
+            <div class="search-row">
+              <input id="query" placeholder="e.g. Life of a DON" minlength="2" maxlength="120" required>
+              <button id="searchButton" aria-label="Search albums" type="submit">↗</button>
+            </div>
+          </form>
+          <p class="hint">Metadata search by MusicBrainz. Automatically pulls 3000px artwork &amp; Spotify codes. Press <kbd>/</kbd> to search.</p>
+          <div id="searchStatus" class="status" role="status" aria-live="polite"></div>
+          <div id="searchResults" class="search-results"></div>
+
+          <details>
+            <summary>Edit album details <span>+</span></summary>
+            <div class="fields">
+              <label>Album title<input id="title" maxlength="180"></label>
+              <label>Artist<input id="artist" maxlength="180"></label>
+              <div class="two-col">
+                <label>Release date<input id="date" maxlength="40"></label>
+                <label>Length<input id="duration" maxlength="25" placeholder="51:34"></label>
+              </div>
+              <label>Record label<input id="label" maxlength="100"></label>
+              <label>Track list <small>One title per line · up to 60</small><textarea id="tracks" rows="9"></textarea></label>
+              <a id="metadataSource" hidden target="_blank" rel="noopener noreferrer">View selected MusicBrainz edition ↗</a>
+            </div>
+          </details>
+        </section>
+
+        <!-- STEP 02 -->
+        <section class="control-section">
+          <div class="section-title">
+            <span class="step">02</span>
+            <h2>Bring your artwork</h2>
+          </div>
+          <div class="art-actions-row">
+            <button id="autoPullArtBtn" class="primary auto-btn" type="button">⚡ Pull 3000px Art</button>
+            <button id="toggleArtSearchBtn" class="secondary" type="button">Search Covers ↗</button>
+          </div>
+          <div id="artSearchBox" class="art-search-box" hidden>
+            <form id="artSearchForm">
+              <div class="search-row">
+                <input id="artQuery" placeholder="Search Apple Music, CAA, Deezer...">
+                <button id="artSearchSubmit" aria-label="Find artwork" type="submit">↗</button>
+              </div>
+            </form>
+            <div id="artworkGallery" class="artwork-gallery"></div>
+          </div>
+          <label class="upload-zone" id="dropZone" for="artFile">
+            <span class="upload-icon">↑</span>
+            <strong>Drop your cover here</strong>
+            <span>or choose a file · PNG, JPG, WebP · Ctrl+V to paste</span>
+            <input id="artFile" type="file" accept="image/png,image/jpeg,image/webp">
+          </label>
+          <p class="hint">Use art you created, have permission to reproduce, or have verified is public domain. Buying an album does not grant artwork rights.</p>
+          <label class="check">
+            <input id="rights" type="checkbox" checked>
+            <span>I have the rights needed to reproduce this artwork.</span>
+          </label>
+          <label class="quiet-label">Permission / source note
+            <input id="licenseNote" maxlength="500" placeholder="Your artwork, license URL, or permission reference">
+          </label>
+          <div id="artStatus" class="status" role="status"></div>
+          <div class="quality-row">
+            <span>ARTWORK AT PRINT SIZE</span>
+            <strong id="ppi">—</strong>
+          </div>
+          <p class="hint" id="qualityHint"></p>
+        </section>
+
+        <!-- STEP 03 -->
+        <section class="control-section">
+          <div class="section-title">
+            <span class="step">03</span>
+            <h2>Set the mood</h2>
+          </div>
+          <div class="two-col">
+            <label>Print size
+              <select id="size">
+                <option value="12x12">12 × 12 in (Square Vinyl)</option>
+                <option value="12x18">12 × 18 inches</option>
+                <option value="18x24" selected>18 × 24 inches</option>
+                <option value="24x36">24 × 36 inches</option>
+                <option value="A3">A3 (11.7 × 16.5 in)</option>
+              </select>
+            </label>
+            <label>Paper mood
+              <select id="theme">
+                <option value="obsidian" selected>Obsidian (After hours)</option>
+                <option value="cream">Gallery cream</option>
+                <option value="newsprint">Vintage newsprint</option>
+                <option value="polar">Polar white</option>
+              </select>
+            </label>
+          </div>
+          <div class="two-col">
+            <label>Typography style
+              <select id="fontFamily">
+                <option value="sans" selected>Modern Swiss (Sans)</option>
+                <option value="serif">Editorial (Serif)</option>
+                <option value="mono">Studio Archive (Mono)</option>
+              </select>
+            </label>
+            <label>Track columns
+              <select id="columns">
+                <option value="auto" selected>Auto (Balanced)</option>
+                <option value="1">1 Column</option>
+                <option value="2">2 Columns</option>
+                <option value="3">3 Columns</option>
+              </select>
+            </label>
+          </div>
+          <div class="two-col">
+            <label>Artwork framing
+              <select id="artFit">
+                <option value="meet" selected>Fit (Full Artwork)</option>
+                <option value="slice">Fill (Square Crop)</option>
+              </select>
+            </label>
+            <label>Palette theme
+              <select id="palettePreset">
+                <option value="extract" selected>From Artwork</option>
+                <option value="warmVinyl">Warm Vinyl</option>
+                <option value="tokyoNeon">Tokyo Neon</option>
+                <option value="galleryCream">Gallery Cream</option>
+                <option value="obsidianGold">Obsidian &amp; Gold</option>
+                <option value="nordicMist">Nordic Mist</option>
+                <option value="terracotta">Terracotta</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="palette-heading">
+            <label>Colors from your cover</label>
+            <button class="text-button" id="extract" type="button">Extract again ↻</button>
+          </div>
+          <div id="palette" class="palette"></div>
+          <div class="swatch-hint">Click swatch to set background · Alt+Click for text · Shift+Click for border</div>
+
+          <div class="color-row-wrap">
+            <div class="two-col color-row">
+              <label>Background<input id="background" type="color" value="#14151a"></label>
+              <label>Text<input id="textColor" type="color" value="#ffffff"></label>
+            </div>
+            <button id="swapColorsBtn" type="button" class="swap-colors-btn" title="Swap Background and Text colors (Alt+X)" aria-label="Swap colors">⇄</button>
+          </div>
+
+          <div class="two-col color-row gradient-row">
+            <label>Background style
+              <select id="bgGradient">
+                <option value="none" selected>Solid color</option>
+                <option value="transparent">Transparent (Backgroundless)</option>
+                <option value="linear-v">Vertical fade</option>
+                <option value="linear-d">Diagonal fade (45°)</option>
+                <option value="subtle-linear">Subtle linear fade</option>
+                <option value="radial">Ambient spotlight (Soft Radial)</option>
+                <option value="vibrant">Vibrant accent blend</option>
+                <option value="palette">Cover palette blend</option>
+                <option value="duotone">Palette duotone</option>
+              </select>
+            </label>
+            <div id="bg2Group" hidden>
+              <label>Gradient 2nd color<input id="background2" type="color" value="#080808"></label>
+            </div>
+          </div>
+          <div class="border-control">
+            <label for="borderWidth">Artwork border <output id="borderValue">8 px</output></label>
+            <div class="range-row">
+              <input id="borderWidth" type="range" min="0" max="24" value="8">
+              <input id="borderColor" aria-label="Border color" type="color" value="#ede6d5">
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 04 -->
+        <section class="control-section">
+          <div class="section-title">
+            <span class="step">04</span>
+            <h2>Add a real Spotify Code</h2>
+            <span class="optional">OPTIONAL</span>
+          </div>
+          <label>Spotify album link or URI
+            <input id="spotifyUrl" placeholder="https://open.spotify.com/album/…" maxlength="250">
+          </label>
+          <div class="code-actions">
+            <button id="autoPullCodeBtn" class="primary auto-btn" type="button">⚡ Auto-pull Code</button>
+            <button id="copyUri" class="secondary" type="button">Copy URI</button>
+            <a class="secondary" href="https://www.spotifycodes.com/" target="_blank" rel="noopener noreferrer">Official generator ↗</a>
+          </div>
+          <p class="hint">Auto-pull downloads the genuine Spotify Code directly from Spotify. Unmodified official asset.</p>
+          <label class="file-button">Import official Code
+            <input id="codeFile" type="file" accept="image/svg+xml,image/png">
+          </label>
+          <button id="removeCode" class="text-button" type="button" hidden>Remove Code</button>
+          <div id="codeStatus" class="status" role="status"></div>
+          <label class="check">
+            <input id="codeConfirmed" type="checkbox">
+            <span>I scanned this Code in Spotify and confirmed it opens the album above.</span>
+          </label>
+          <p class="notice">Spotify prohibits Codes on products sold. Adding a Code does not grant rights to the album art. <a href="https://www.spotifycodes.com/assets/Terms_and_Conditions_for_Spotify_Codes_2025_10_09.pdf" target="_blank" rel="noopener noreferrer">Read terms ↗</a></p>
+        </section>
+      </aside>
+
+      <!-- STAGE PREVIEW -->
+      <section class="stage" aria-label="Live poster preview">
+        <div class="stage-toolbar">
+          <span><i></i> LIVE PREVIEW</span>
+          <div class="view-controls">
+            <span id="sizeBadge">18 × 24 IN</span>
+            <button id="zoomToggle" type="button">Zoom ⤢</button>
+            <button id="reset" type="button">Reset demo ↻</button>
+          </div>
+        </div>
+        <div class="poster-wrap">
+          <div id="poster" aria-label="Your poster"></div>
+        </div>
+        <div class="stage-caption">
+          <span id="previewCaption">ORIGINAL DEMO ART · NO ALBUM ART INCLUDED</span>
+          <span>01 / 01</span>
+        </div>
+        <div class="export-panel">
+          <div>
+            <h2>Ready for the wall.</h2>
+            <p id="exportDescription">Vector SVG, high-resolution PNG, or print to PDF.</p>
+          </div>
+          <div class="export-controls">
+            <label class="dpi-label" for="dpi">PNG resolution
+              <select id="dpi">
+                <option value="150">150 DPI</option>
+                <option value="300" selected>300 DPI</option>
+              </select>
+            </label>
+            <button class="secondary" id="copySvg" type="button" title="Copy clean vector SVG to clipboard">📋 Copy SVG</button>
+            <button class="secondary" id="exportSvg" type="button">↓ SVG</button>
+            <button class="primary" id="exportPng" type="button">↓ PNG</button>
+            <button class="secondary" id="printPdf" type="button">Print / PDF</button>
+          </div>
+          <div id="exportStatus" class="status" role="status" aria-live="polite"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- DIALOG: KEYBOARD SHORTCUTS -->
+    <dialog id="shortcutsDialog" class="shortcuts-dialog">
+      <div class="dialog-content">
+        <div class="dialog-header">
+          <h3>Keyboard Shortcuts</h3>
+          <button type="button" class="close-dialog" id="closeShortcutsBtn" aria-label="Close dialog">✕</button>
+        </div>
+        <table class="shortcuts-table">
+          <tbody>
+            <tr><td><kbd>/</kbd> or <kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Focus album or artist search</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>V</kbd></td><td>Paste cover image directly from clipboard</td></tr>
+            <tr><td><kbd>Alt</kbd>+<kbd>X</kbd></td><td>Swap background and text colors</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td><td>Quick Export PNG (print resolution)</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd></td><td>Download SVG vector file</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>P</kbd></td><td>Open Print / PDF dialog</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Close dialogs or clear search results</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </dialog>
+
+    <footer>
+      <span>DESIGNED TO KEEP THE MUSIC CLOSE.</span>
+      <p>Artwork is processed locally and never uploaded. Album searches reach MusicBrainz through this server. This editor does not grant image licenses or guarantee legal clearance. Not affiliated with Spotify or any artist.</p>
+    </footer>
+  </main>
+</body>
+</html>

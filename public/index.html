@@ -1,18 +1,333 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#eeeae2"><title>Sleeve — Album Poster Studio</title><link rel="stylesheet" href="/styles.css"><script type="module" src="/app.js"></script></head>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#eeeae2">
+  <title>Sleeve — Album Poster Studio</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%2314151a'/%3E%3Ccircle cx='50' cy='50' r='38' fill='none' stroke='%23383a42' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='26' fill='none' stroke='%23383a42' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='16' fill='%237a9238'/%3E%3Ccircle cx='50' cy='50' r='5' fill='%23ffffff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
 <body>
-<header class="masthead"><a class="wordmark" href="/" aria-label="Sleeve home"><span class="record-icon">◉</span> sleeve<span class="wordmark-dot">.</span></a><span class="header-note">YOUR MUSIC. YOUR WALL.</span><span class="privacy"><i></i> Artwork stays on your device</span></header>
-<main><section class="intro"><div><div class="eyebrow">THE ALBUM POSTER STUDIO</div><h1>A record worth framing.</h1><p>Find the music. Bring the artwork. Make it yours.</p></div><div class="intro-note">Original layouts.<br>Print-sized exports.<br>Made for your collection.</div></section>
-<div class="workspace"><aside class="controls" aria-label="Poster controls">
-<section class="control-section"><div class="section-title"><span class="step">01</span><h2>Find your record</h2></div><div class="presets-block"><span class="presets-label">Sample inspiration:</span><div class="presets-row"><button type="button" class="preset-chip active" data-preset="slowOrbit">Slow Orbit</button><button type="button" class="preset-chip" data-preset="darkSide">Dark Side</button><button type="button" class="preset-chip" data-preset="kindOfBlue">Kind of Blue</button><button type="button" class="preset-chip" data-preset="discovery">Discovery</button><button type="button" class="preset-chip" data-preset="rumours">Rumours</button><button type="button" class="preset-chip" data-preset="okComputer">OK Computer</button></div></div><form id="searchForm"><label for="query">Album or artist</label><div class="search-row"><input id="query" placeholder="e.g. Life of a DON" minlength="2" maxlength="120" required><button id="searchButton" aria-label="Search albums" type="submit">↗</button></div></form><p class="hint">Metadata search by MusicBrainz. Automatically pulls 3000px artwork &amp; Spotify codes.</p><div id="searchStatus" class="status" role="status" aria-live="polite"></div><div id="searchResults" class="search-results"></div>
-<details><summary>Edit album details <span>+</span></summary><div class="fields"><label>Album title<input id="title" maxlength="180"></label><label>Artist<input id="artist" maxlength="180"></label><div class="two-col"><label>Release date<input id="date" maxlength="40"></label><label>Length<input id="duration" maxlength="25" placeholder="51:34"></label></div><label>Record label<input id="label" maxlength="100"></label><label>Track list <small>One title per line · up to 60</small><textarea id="tracks" rows="9"></textarea></label><a id="metadataSource" hidden target="_blank" rel="noopener noreferrer">View selected MusicBrainz edition ↗</a></div></details></section>
+  <div id="dropOverlay" class="drop-overlay" hidden>
+    <div class="drop-modal">
+      <span class="drop-icon">↑</span>
+      <h3>Drop album cover here</h3>
+      <p>High-resolution PNG, JPG, or WebP</p>
+    </div>
+  </div>
 
-<section class="control-section"><div class="section-title"><span class="step">02</span><h2>Bring your artwork</h2></div><div class="art-actions-row"><button id="autoPullArtBtn" class="primary auto-btn" type="button">⚡ Pull 3000px Art</button><button id="toggleArtSearchBtn" class="secondary" type="button">Search Covers ↗</button></div><div id="artSearchBox" class="art-search-box" hidden><form id="artSearchForm"><div class="search-row"><input id="artQuery" placeholder="Search Apple Music, CAA, Deezer..."><button id="artSearchSubmit" aria-label="Find artwork" type="submit">↗</button></div></form><div id="artworkGallery" class="artwork-gallery"></div></div><label class="upload-zone" id="dropZone" for="artFile"><span class="upload-icon">↑</span><strong>Drop your cover here</strong><span>or choose a file · PNG, JPG, WebP</span><input id="artFile" type="file" accept="image/png,image/jpeg,image/webp"></label><p class="hint">Use art you created, have permission to reproduce, or have verified is public domain. Buying an album does not grant artwork rights.</p><label class="check"><input id="rights" type="checkbox" checked><span>I have the rights needed to reproduce this artwork.</span></label><label class="quiet-label">Permission / source note <input id="licenseNote" maxlength="500" placeholder="Your artwork, license URL, or permission reference"></label><div id="artStatus" class="status" role="status"></div><div class="quality-row"><span>ARTWORK AT PRINT SIZE</span><strong id="ppi">—</strong></div><p class="hint" id="qualityHint"></p></section>
+  <header class="masthead">
+    <a class="wordmark" href="/" aria-label="Sleeve home">
+      <span class="record-icon">◉</span> sleeve<span class="wordmark-dot">.</span>
+    </a>
+    <span class="header-note">YOUR MUSIC. YOUR WALL.</span>
+    <div class="masthead-right">
+      <button id="shortcutsBtn" class="pill-btn" type="button" title="Keyboard shortcuts" aria-label="Keyboard shortcuts">⌨ Shortcuts</button>
+      <button id="uiThemeToggle" class="pill-btn" type="button" title="Toggle Studio Dark / Paper mode" aria-label="Toggle UI Theme">🌙 Dark Studio</button>
+      <span class="privacy"><i></i> Artwork stays on your device</span>
+    </div>
+  </header>
 
-<section class="control-section"><div class="section-title"><span class="step">03</span><h2>Set the mood</h2></div><div class="two-col"><label>Print size<select id="size"><option value="12x12">12 × 12 in (Square Vinyl)</option><option value="12x18">12 × 18 inches</option><option value="18x24" selected>18 × 24 inches</option><option value="24x36">24 × 36 inches</option><option value="A3">A3 (11.7 × 16.5 in)</option></select></label><label>Paper mood<select id="theme"><option value="obsidian" selected>Obsidian (After hours)</option><option value="cream">Gallery cream</option><option value="newsprint">Vintage newsprint</option><option value="polar">Polar white</option></select></label></div><div class="two-col"><label>Typography style<select id="fontFamily"><option value="sans" selected>Modern Swiss (Sans)</option><option value="serif">Editorial (Serif)</option><option value="mono">Studio Archive (Mono)</option></select></label><label>Track columns<select id="columns"><option value="auto" selected>Auto (Balanced)</option><option value="1">1 Column</option><option value="2">2 Columns</option><option value="3">3 Columns</option></select></label></div><div class="two-col"><label>Artwork framing<select id="artFit"><option value="meet" selected>Fit (Full Artwork)</option><option value="slice">Fill (Square Crop)</option></select></label><label>Palette theme<select id="palettePreset"><option value="extract" selected>From Artwork</option><option value="warmVinyl">Warm Vinyl</option><option value="tokyoNeon">Tokyo Neon</option><option value="galleryCream">Gallery Cream</option><option value="obsidianGold">Obsidian & Gold</option><option value="nordicMist">Nordic Mist</option><option value="terracotta">Terracotta</option></select></label></div><div class="palette-heading"><label>Colors from your cover</label><button class="text-button" id="extract" type="button">Extract again ↻</button></div><div id="palette" class="palette"></div><div class="two-col color-row"><label>Background<input id="background" type="color" value="#14151a"></label><label>Text<input id="textColor" type="color" value="#ffffff"></label></div><div class="two-col color-row gradient-row"><label>Background style<select id="bgGradient"><option value="none" selected>Solid color</option><option value="transparent">Transparent (Backgroundless)</option><option value="linear-v">Vertical fade</option><option value="linear-d">Diagonal fade (45°)</option><option value="subtle-linear">Subtle linear fade</option><option value="radial">Ambient spotlight (Soft Radial)</option><option value="vibrant">Vibrant accent blend</option><option value="palette">Cover palette blend</option><option value="duotone">Palette duotone</option></select></label><div id="bg2Group" hidden><label>Gradient 2nd color<input id="background2" type="color" value="#080808"></label></div></div><div class="border-control"><label for="borderWidth">Artwork border <output id="borderValue">8 px</output></label><div class="range-row"><input id="borderWidth" type="range" min="0" max="24" value="8"><input id="borderColor" aria-label="Border color" type="color" value="#ede6d5"></div></div></section>
+  <main>
+    <section class="intro">
+      <div>
+        <div class="eyebrow">THE ALBUM POSTER STUDIO</div>
+        <h1>A record worth framing.</h1>
+        <p>Find the music. Bring the artwork. Make it yours.</p>
+      </div>
+      <div class="intro-note">
+        Original layouts.<br>
+        Print-sized exports.<br>
+        Made for your collection.
+      </div>
+    </section>
 
-<section class="control-section"><div class="section-title"><span class="step">04</span><h2>Add a real Spotify Code</h2><span class="optional">OPTIONAL</span></div><label>Spotify album link or URI<input id="spotifyUrl" placeholder="https://open.spotify.com/album/…" maxlength="250"></label><div class="code-actions"><button id="autoPullCodeBtn" class="primary auto-btn" type="button">⚡ Auto-pull Code</button><button id="copyUri" class="secondary" type="button">Copy URI</button><a class="secondary" href="https://www.spotifycodes.com/" target="_blank" rel="noopener noreferrer">Official generator ↗</a></div><p class="hint">Auto-pull downloads the genuine Spotify Code directly from Spotify. Unmodified official asset.</p><label class="file-button">Import official Code<input id="codeFile" type="file" accept="image/svg+xml,image/png"></label><button id="removeCode" class="text-button" type="button" hidden>Remove Code</button><div id="codeStatus" class="status" role="status"></div><label class="check"><input id="codeConfirmed" type="checkbox"><span>I scanned this Code in Spotify and confirmed it opens the album above.</span></label><p class="notice">Spotify prohibits Codes on products sold. Adding a Code does not grant rights to the album art. <a href="https://www.spotifycodes.com/assets/Terms_and_Conditions_for_Spotify_Codes_2025_10_09.pdf" target="_blank" rel="noopener noreferrer">Read terms ↗</a></p></section>
-</aside>
-<section class="stage" aria-label="Live poster preview"><div class="stage-toolbar"><span><i></i> LIVE PREVIEW</span><div class="view-controls"><span id="sizeBadge">18 × 24 IN</span><button id="zoomToggle" type="button">Zoom ⤢</button><button id="reset" type="button">Reset demo ↻</button></div></div><div class="poster-wrap"><div id="poster" aria-label="Your poster"></div></div><div class="stage-caption"><span id="previewCaption">ORIGINAL DEMO ART · NO ALBUM ART INCLUDED</span><span>01 / 01</span></div><div class="export-panel"><div><h2>Ready for the wall.</h2><p id="exportDescription">Vector SVG, high-resolution PNG, or print to PDF.</p></div><div class="export-controls"><label class="dpi-label" for="dpi">PNG resolution<select id="dpi"><option value="150">150 DPI</option><option value="300" selected>300 DPI</option></select></label><button class="secondary" id="exportSvg" type="button">↓ SVG</button><button class="primary" id="exportPng" type="button">↓ PNG</button><button class="secondary" id="printPdf" type="button">Print / PDF</button></div><div id="exportStatus" class="status" role="status" aria-live="polite"></div></div></section></div>
-<footer><span>DESIGNED TO KEEP THE MUSIC CLOSE.</span><p>Artwork is processed locally and never uploaded. Album searches reach MusicBrainz through this server. This editor does not grant image licenses or guarantee legal clearance. Not affiliated with Spotify or any artist.</p></footer>
-</main></body></html>
+    <div class="workspace">
+      <aside class="controls" aria-label="Poster controls">
+        <!-- STEP 01 -->
+        <section class="control-section">
+          <div class="section-title">
+            <span class="step">01</span>
+            <h2>Find your record</h2>
+          </div>
+          <div class="presets-block">
+            <span class="presets-label">Sample inspiration:</span>
+            <div class="presets-row">
+              <button type="button" class="preset-chip active" data-preset="slowOrbit">Slow Orbit</button>
+              <button type="button" class="preset-chip" data-preset="darkSide">Dark Side</button>
+              <button type="button" class="preset-chip" data-preset="kindOfBlue">Kind of Blue</button>
+              <button type="button" class="preset-chip" data-preset="discovery">Discovery</button>
+              <button type="button" class="preset-chip" data-preset="rumours">Rumours</button>
+              <button type="button" class="preset-chip" data-preset="okComputer">OK Computer</button>
+            </div>
+          </div>
+          <form id="searchForm">
+            <label for="query">Album or artist</label>
+            <div class="search-row">
+              <input id="query" placeholder="e.g. Life of a DON" minlength="2" maxlength="120" required>
+              <button id="searchButton" aria-label="Search albums" type="submit">↗</button>
+            </div>
+          </form>
+          <p class="hint">Metadata search by MusicBrainz. Automatically pulls 3000px artwork &amp; Spotify codes. Press <kbd>/</kbd> to search.</p>
+          <div id="searchStatus" class="status" role="status" aria-live="polite"></div>
+          <div id="searchResults" class="search-results"></div>
+
+          <details>
+            <summary>Edit album details <span>+</span></summary>
+            <div class="fields">
+              <label>Album title<input id="title" maxlength="180"></label>
+              <label>Artist<input id="artist" maxlength="180"></label>
+              <div class="two-col">
+                <label>Release date<input id="date" maxlength="40"></label>
+                <label>Length<input id="duration" maxlength="25" placeholder="51:34"></label>
+              </div>
+              <label>Record label<input id="label" maxlength="100"></label>
+              <label>Track list <small>One title per line · up to 60</small><textarea id="tracks" rows="9"></textarea></label>
+              <a id="metadataSource" hidden target="_blank" rel="noopener noreferrer">View selected MusicBrainz edition ↗</a>
+            </div>
+          </details>
+        </section>
+
+        <!-- STEP 02 -->
+        <section class="control-section">
+          <div class="section-title">
+            <span class="step">02</span>
+            <h2>Bring your artwork</h2>
+          </div>
+          <div class="art-actions-row">
+            <button id="autoPullArtBtn" class="primary auto-btn" type="button">⚡ Pull 3000px Art</button>
+            <button id="toggleArtSearchBtn" class="secondary" type="button">Search Covers ↗</button>
+          </div>
+          <div id="artSearchBox" class="art-search-box" hidden>
+            <form id="artSearchForm">
+              <div class="search-row">
+                <input id="artQuery" placeholder="Search Apple Music, CAA, Deezer...">
+                <button id="artSearchSubmit" aria-label="Find artwork" type="submit">↗</button>
+              </div>
+            </form>
+            <div id="artworkGallery" class="artwork-gallery"></div>
+          </div>
+          <label class="upload-zone" id="dropZone" for="artFile">
+            <span class="upload-icon">↑</span>
+            <strong>Drop your cover here</strong>
+            <span>or choose a file · PNG, JPG, WebP · Ctrl+V to paste</span>
+            <input id="artFile" type="file" accept="image/png,image/jpeg,image/webp">
+          </label>
+          <p class="hint">Use art you created, have permission to reproduce, or have verified is public domain. Buying an album does not grant artwork rights.</p>
+          <label class="check">
+            <input id="rights" type="checkbox" checked>
+            <span>I have the rights needed to reproduce this artwork.</span>
+          </label>
+          <label class="quiet-label">Permission / source note
+            <input id="licenseNote" maxlength="500" placeholder="Your artwork, license URL, or permission reference">
+          </label>
+          <div id="artStatus" class="status" role="status"></div>
+          <div class="quality-row">
+            <span>ARTWORK AT PRINT SIZE</span>
+            <strong id="ppi">—</strong>
+          </div>
+          <p class="hint" id="qualityHint"></p>
+        </section>
+
+        <!-- STEP 03 -->
+        <section class="control-section">
+          <div class="section-title">
+            <span class="step">03</span>
+            <h2>Set the mood</h2>
+          </div>
+          <div class="two-col">
+            <label>Print size
+              <select id="size">
+                <option value="12x12">12 × 12 in (Square Vinyl)</option>
+                <option value="12x18">12 × 18 inches</option>
+                <option value="18x24" selected>18 × 24 inches</option>
+                <option value="24x36">24 × 36 inches</option>
+                <option value="A3">A3 (11.7 × 16.5 in)</option>
+              </select>
+            </label>
+            <label>Paper mood
+              <select id="theme">
+                <option value="obsidian" selected>Obsidian (After hours)</option>
+                <option value="cream">Gallery cream</option>
+                <option value="newsprint">Vintage newsprint</option>
+                <option value="polar">Polar white</option>
+              </select>
+            </label>
+          </div>
+          <div class="two-col">
+            <label>Typography style
+              <select id="fontFamily">
+                <option value="sans" selected>Modern Swiss (Sans)</option>
+                <option value="serif">Editorial (Serif)</option>
+                <option value="mono">Studio Archive (Mono)</option>
+              </select>
+            </label>
+            <label>Track columns
+              <select id="columns">
+                <option value="auto" selected>Auto (Balanced)</option>
+                <option value="1">1 Column</option>
+                <option value="2">2 Columns</option>
+                <option value="3">3 Columns</option>
+              </select>
+            </label>
+          </div>
+          <div class="two-col">
+            <label>Artwork framing
+              <select id="artFit">
+                <option value="meet" selected>Fit (Full Artwork)</option>
+                <option value="slice">Fill (Square Crop)</option>
+              </select>
+            </label>
+            <label>Palette theme
+              <select id="palettePreset">
+                <option value="extract" selected>From Artwork</option>
+                <option value="warmVinyl">Warm Vinyl</option>
+                <option value="tokyoNeon">Tokyo Neon</option>
+                <option value="galleryCream">Gallery Cream</option>
+                <option value="obsidianGold">Obsidian &amp; Gold</option>
+                <option value="nordicMist">Nordic Mist</option>
+                <option value="terracotta">Terracotta</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="palette-heading">
+            <label>Colors from your cover</label>
+            <button class="text-button" id="extract" type="button">Extract again ↻</button>
+          </div>
+          <div id="palette" class="palette"></div>
+          <div class="swatch-hint">Click swatch to set background · Alt+Click for text · Shift+Click for border</div>
+
+          <div class="color-row-wrap">
+            <div class="two-col color-row">
+              <label>Background<input id="background" type="color" value="#14151a"></label>
+              <label>Text<input id="textColor" type="color" value="#ffffff"></label>
+            </div>
+            <button id="swapColorsBtn" type="button" class="swap-colors-btn" title="Swap Background and Text colors (Alt+X)" aria-label="Swap colors">⇄</button>
+          </div>
+
+          <div class="two-col color-row gradient-row">
+            <label>Background style
+              <select id="bgGradient">
+                <option value="none" selected>Solid color</option>
+                <option value="transparent">Transparent (Backgroundless)</option>
+                <option value="linear-v">Vertical fade</option>
+                <option value="linear-d">Diagonal fade (45°)</option>
+                <option value="subtle-linear">Subtle linear fade</option>
+                <option value="radial">Ambient spotlight (Soft Radial)</option>
+                <option value="vibrant">Vibrant accent blend</option>
+                <option value="palette">Cover palette blend</option>
+                <option value="duotone">Palette duotone</option>
+              </select>
+            </label>
+            <div id="bg2Group" hidden>
+              <label>Gradient 2nd color<input id="background2" type="color" value="#080808"></label>
+            </div>
+          </div>
+          <div class="border-control">
+            <label for="borderWidth">Artwork border <output id="borderValue">8 px</output></label>
+            <div class="range-row">
+              <input id="borderWidth" type="range" min="0" max="24" value="8">
+              <input id="borderColor" aria-label="Border color" type="color" value="#ede6d5">
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 04 -->
+        <section class="control-section">
+          <div class="section-title">
+            <span class="step">04</span>
+            <h2>Add a real Spotify Code</h2>
+            <span class="optional">OPTIONAL</span>
+          </div>
+          <label>Spotify album link or URI
+            <input id="spotifyUrl" placeholder="https://open.spotify.com/album/…" maxlength="250">
+          </label>
+          <div class="code-actions">
+            <button id="autoPullCodeBtn" class="primary auto-btn" type="button">⚡ Auto-pull Code</button>
+            <button id="copyUri" class="secondary" type="button">Copy URI</button>
+            <a class="secondary" href="https://www.spotifycodes.com/" target="_blank" rel="noopener noreferrer">Official generator ↗</a>
+          </div>
+          <p class="hint">Auto-pull downloads the genuine Spotify Code directly from Spotify. Unmodified official asset.</p>
+          <label class="file-button">Import official Code
+            <input id="codeFile" type="file" accept="image/svg+xml,image/png">
+          </label>
+          <button id="removeCode" class="text-button" type="button" hidden>Remove Code</button>
+          <div id="codeStatus" class="status" role="status"></div>
+          <label class="check">
+            <input id="codeConfirmed" type="checkbox">
+            <span>I scanned this Code in Spotify and confirmed it opens the album above.</span>
+          </label>
+          <p class="notice">Spotify prohibits Codes on products sold. Adding a Code does not grant rights to the album art. <a href="https://www.spotifycodes.com/assets/Terms_and_Conditions_for_Spotify_Codes_2025_10_09.pdf" target="_blank" rel="noopener noreferrer">Read terms ↗</a></p>
+        </section>
+      </aside>
+
+      <!-- STAGE PREVIEW -->
+      <section class="stage" aria-label="Live poster preview">
+        <div class="stage-toolbar">
+          <span><i></i> LIVE PREVIEW</span>
+          <div class="view-controls">
+            <span id="sizeBadge">18 × 24 IN</span>
+            <button id="zoomToggle" type="button">Zoom ⤢</button>
+            <button id="reset" type="button">Reset demo ↻</button>
+          </div>
+        </div>
+        <div class="poster-wrap">
+          <div id="poster" aria-label="Your poster"></div>
+        </div>
+        <div class="stage-caption">
+          <span id="previewCaption">ORIGINAL DEMO ART · NO ALBUM ART INCLUDED</span>
+          <span>01 / 01</span>
+        </div>
+        <div class="export-panel">
+          <div>
+            <h2>Ready for the wall.</h2>
+            <p id="exportDescription">Vector SVG, high-resolution PNG, or print to PDF.</p>
+          </div>
+          <div class="export-controls">
+            <label class="dpi-label" for="dpi">PNG resolution
+              <select id="dpi">
+                <option value="150">150 DPI</option>
+                <option value="300" selected>300 DPI</option>
+              </select>
+            </label>
+            <button class="secondary" id="copySvg" type="button" title="Copy clean vector SVG to clipboard">📋 Copy SVG</button>
+            <button class="secondary" id="exportSvg" type="button">↓ SVG</button>
+            <button class="primary" id="exportPng" type="button">↓ PNG</button>
+            <button class="secondary" id="printPdf" type="button">Print / PDF</button>
+          </div>
+          <div id="exportStatus" class="status" role="status" aria-live="polite"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- DIALOG: KEYBOARD SHORTCUTS -->
+    <dialog id="shortcutsDialog" class="shortcuts-dialog">
+      <div class="dialog-content">
+        <div class="dialog-header">
+          <h3>Keyboard Shortcuts</h3>
+          <button type="button" class="close-dialog" id="closeShortcutsBtn" aria-label="Close dialog">✕</button>
+        </div>
+        <table class="shortcuts-table">
+          <tbody>
+            <tr><td><kbd>/</kbd> or <kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Focus album or artist search</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>V</kbd></td><td>Paste cover image directly from clipboard</td></tr>
+            <tr><td><kbd>Alt</kbd>+<kbd>X</kbd></td><td>Swap background and text colors</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td><td>Quick Export PNG (print resolution)</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd></td><td>Download SVG vector file</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>P</kbd></td><td>Open Print / PDF dialog</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Close dialogs or clear search results</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </dialog>
+
+    <footer>
+      <span>DESIGNED TO KEEP THE MUSIC CLOSE.</span>
+      <p>Artwork is processed locally and never uploaded. Album searches reach MusicBrainz through this server. This editor does not grant image licenses or guarantee legal clearance. Not affiliated with Spotify or any artist.</p>
+    </footer>
+  </main>
+</body>
+</html>

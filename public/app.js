@@ -3,7 +3,23 @@ import {createPosterSVG, extractPalette, effectivePpi} from './renderer.js';
 
 const $=id=>document.getElementById(id);
 let state, artImage, svg='', requestId=0;
-const status=(id,message,error=false)=>{ $(id).textContent=message;$(id).className='status '+(error?'error':'success'); };
+const statusTimers = new Map();
+const status = (id, message, error = false) => {
+  const el = $(id);
+  if (!el) return;
+  el.textContent = message;
+  el.className = 'status ' + (error ? 'error' : message ? 'success' : '');
+  if (statusTimers.has(id)) clearTimeout(statusTimers.get(id));
+  if (message && !error && id !== 'searchStatus') {
+    const timer = setTimeout(() => {
+      if (el.textContent === message) {
+        el.textContent = '';
+        el.className = 'status';
+      }
+    }, 7000);
+    statusTimers.set(id, timer);
+  }
+};
 const loadImage=src=>new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('This image could not be decoded. Try PNG or JPEG.'));image.src=src;});
 const readFile=file=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Could not read this file.'));reader.readAsDataURL(file);});
 const utf8Base64=text=>{const bytes=new TextEncoder().encode(text);let binary='';for(let i=0;i<bytes.length;i+=16384)binary+=String.fromCharCode(...bytes.subarray(i,i+16384));return btoa(binary);};
@@ -266,12 +282,66 @@ function updateBg2Visibility(){
 }
 
 function paintPalette(){
-  $('palette').replaceChildren(...state.palette.map((color,i)=>{
-    const input=document.createElement('input');
-    input.type='color';input.value=color;
-    input.setAttribute('aria-label',`Palette color ${i+1}`);
-    input.addEventListener('input',()=>{ state.palette[i]=input.value; render(); });
-    return input;
+  const paletteEl = $('palette');
+  if (!paletteEl) return;
+  paletteEl.replaceChildren(...state.palette.map((color, i) => {
+    const card = document.createElement('div');
+    card.className = 'palette-swatch-card';
+    card.style.backgroundColor = color;
+    card.title = `Color ${i + 1} (${color})\n• Click: Set as Background\n• Alt+Click: Set as Text\n• Shift+Click: Set as Border`;
+
+    const hint = document.createElement('span');
+    hint.className = 'swatch-action-hint';
+    hint.textContent = 'SET BG';
+    card.appendChild(hint);
+
+    const input = document.createElement('input');
+    input.type = 'color';
+    input.value = color;
+    input.setAttribute('aria-label', `Palette color ${i + 1}`);
+
+    card.addEventListener('click', (e) => {
+      if (e.target === input) return;
+      if (e.altKey) {
+        state.textColor = color;
+        if (state.codeDataUrl) {
+          state.codeDataUrl = recolorCodeSvg(state.codeDataUrl, state.textColor);
+        }
+        syncFields();
+        render();
+        status('exportStatus', `Text ink set to ${color}`);
+      } else if (e.shiftKey) {
+        state.borderColor = color;
+        syncFields();
+        render();
+        status('exportStatus', `Artwork border set to ${color}`);
+      } else {
+        state.background = color;
+        syncFields();
+        render();
+        status('exportStatus', `Poster background set to ${color}`);
+      }
+    });
+
+    card.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      state.textColor = color;
+      if (state.codeDataUrl) {
+        state.codeDataUrl = recolorCodeSvg(state.codeDataUrl, state.textColor);
+      }
+      syncFields();
+      render();
+      status('exportStatus', `Text ink set to ${color}`);
+    });
+
+    input.addEventListener('input', () => {
+      state.palette[i] = input.value;
+      card.style.backgroundColor = input.value;
+      render();
+    });
+
+    card.appendChild(input);
+    return card;
   }));
 }
 
@@ -380,6 +450,23 @@ if (bgGradientEl) {
     updateBg2Visibility();
     render();
   });
+}
+
+function swapColors() {
+  const tmp = state.background;
+  state.background = state.textColor;
+  state.textColor = tmp;
+  if (state.codeDataUrl) {
+    state.codeDataUrl = recolorCodeSvg(state.codeDataUrl, state.textColor);
+  }
+  syncFields();
+  render();
+  status('exportStatus', 'Background and text colors swapped.');
+}
+
+const swapColorsBtn = $('swapColorsBtn');
+if (swapColorsBtn) {
+  swapColorsBtn.addEventListener('click', swapColors);
 }
 
 $('tracks').addEventListener('input',()=>{
@@ -892,6 +979,19 @@ function download(blob,name){
   setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
 
+const copySvgBtn = $('copySvg');
+if (copySvgBtn) {
+  copySvgBtn.addEventListener('click', async () => {
+    try {
+      exportAllowed();
+      await navigator.clipboard.writeText(svg);
+      status('exportStatus', '✓ Vector SVG copied to clipboard! Ready to paste into Figma or Illustrator.');
+    } catch (e) {
+      status('exportStatus', e.message, true);
+    }
+  });
+}
+
 $('exportSvg').addEventListener('click',()=>{
   try{
     exportAllowed();
@@ -904,14 +1004,16 @@ $('exportSvg').addEventListener('click',()=>{
 
 $('exportPng').addEventListener('click',async()=>{
   let objectUrl;
+  const originalText = $('exportPng').textContent;
   try{
     exportAllowed();
     $('exportPng').disabled=true;
+    $('exportPng').textContent='⏳ Rendering…';
     const exportSvg=svg,exportSize=state.size,exportName=slug();
     const dpi=Number($('dpi').value);
     const [w,h]=(exportSize==='A3'?[11.7,16.5]:exportSize.split('x').map(Number));
     status('exportStatus',`Rendering ${Math.round(w*dpi)} × ${Math.round(h*dpi)} pixels…`);
-    await new Promise(r=>setTimeout(r,30));
+    await new Promise(r=>setTimeout(r,50));
     objectUrl=URL.createObjectURL(new Blob([exportSvg],{type:'image/svg+xml'}));
     const image=await loadImage(objectUrl);
     const c=document.createElement('canvas');
@@ -924,11 +1026,12 @@ $('exportPng').addEventListener('click',async()=>{
     if(!blob)throw new Error('Export exceeded browser memory. Try 150 DPI.');
     download(await pngWithDpi(blob,dpi),`${exportName}-${exportSize}-${dpi}dpi.png`);
     c.width=c.height=1;
-    status('exportStatus','PNG downloaded with print-resolution metadata. Source artwork detail is unchanged.');
+    status('exportStatus','✓ PNG downloaded with print-resolution metadata. Source artwork detail is unchanged.');
   }catch(e){
     status('exportStatus',e.message,true);
   }finally{
     $('exportPng').disabled=false;
+    $('exportPng').textContent=originalText;
     if(objectUrl)URL.revokeObjectURL(objectUrl);
   }
 });
@@ -948,5 +1051,153 @@ $('printPdf').addEventListener('click',()=>{
     status('exportStatus',e.message,true);
   }
 });
+
+// Full-Window Drag & Drop for Artwork
+let dragCounter = 0;
+const dropOverlay = $('dropOverlay');
+
+window.addEventListener('dragenter', (e) => {
+  if (e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files')) {
+    dragCounter++;
+    if (dropOverlay) dropOverlay.hidden = false;
+  }
+});
+
+window.addEventListener('dragleave', (e) => {
+  dragCounter--;
+  if (dragCounter <= 0) {
+    dragCounter = 0;
+    if (dropOverlay) dropOverlay.hidden = true;
+  }
+});
+
+window.addEventListener('dragover', (e) => {
+  e.preventDefault();
+});
+
+window.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  dragCounter = 0;
+  if (dropOverlay) dropOverlay.hidden = true;
+  const file = e.dataTransfer?.files?.[0];
+  if (file && (file.type.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(file.name))) {
+    await applyArt(file);
+    status('artStatus', `✓ Dropped image applied: ${file.name}`);
+  }
+});
+
+// Clipboard Paste for Artwork (Ctrl+V anywhere)
+window.addEventListener('paste', async (e) => {
+  const items = e.clipboardData?.items;
+  if (!items) return;
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      e.preventDefault();
+      const file = item.getAsFile();
+      if (file) {
+        await applyArt(file);
+        status('artStatus', '✓ Artwork image pasted from clipboard.');
+        break;
+      }
+    }
+  }
+});
+
+// Shortcuts Dialog Modal
+const shortcutsDialog = $('shortcutsDialog');
+const shortcutsBtn = $('shortcutsBtn');
+const closeShortcutsBtn = $('closeShortcutsBtn');
+
+if (shortcutsBtn && shortcutsDialog) {
+  shortcutsBtn.addEventListener('click', () => {
+    if (typeof shortcutsDialog.showModal === 'function') {
+      shortcutsDialog.showModal();
+    } else {
+      shortcutsDialog.setAttribute('open', '');
+    }
+  });
+}
+if (closeShortcutsBtn && shortcutsDialog) {
+  closeShortcutsBtn.addEventListener('click', () => {
+    if (typeof shortcutsDialog.close === 'function') {
+      shortcutsDialog.close();
+    } else {
+      shortcutsDialog.removeAttribute('open');
+    }
+  });
+}
+if (shortcutsDialog) {
+  shortcutsDialog.addEventListener('click', (e) => {
+    if (e.target === shortcutsDialog && typeof shortcutsDialog.close === 'function') {
+      shortcutsDialog.close();
+    }
+  });
+}
+
+// Global Keyboard Shortcuts
+window.addEventListener('keydown', (e) => {
+  const active = document.activeElement;
+  const isTyping = active && ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName);
+
+  if (e.key === '/' && !isTyping) {
+    e.preventDefault();
+    const q = $('query');
+    if (q) { q.focus(); q.select(); }
+  } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    const q = $('query');
+    if (q) { q.focus(); q.select(); }
+  } else if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    $('exportPng')?.click();
+  } else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'e') {
+    e.preventDefault();
+    $('exportSvg')?.click();
+  } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+    e.preventDefault();
+    $('printPdf')?.click();
+  } else if (e.altKey && e.key.toLowerCase() === 'x') {
+    e.preventDefault();
+    swapColors();
+  } else if (e.key === 'Escape') {
+    if (shortcutsDialog && shortcutsDialog.open) {
+      if (typeof shortcutsDialog.close === 'function') shortcutsDialog.close();
+      else shortcutsDialog.removeAttribute('open');
+    }
+    const artBox = $('artSearchBox');
+    if (artBox && !artBox.hidden) artBox.hidden = true;
+    $('searchResults')?.replaceChildren();
+  }
+});
+
+// UI Dark Theme Toggle
+const uiThemeToggle = $('uiThemeToggle');
+function initUiTheme() {
+  const saved = localStorage.getItem('sleeve_ui_theme');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = saved ? saved === 'dark' : prefersDark;
+  if (isDark) {
+    document.body.setAttribute('data-ui-theme', 'dark');
+    if (uiThemeToggle) uiThemeToggle.textContent = '☀️ Paper Mode';
+  } else {
+    document.body.removeAttribute('data-ui-theme');
+    if (uiThemeToggle) uiThemeToggle.textContent = '🌙 Dark Studio';
+  }
+}
+if (uiThemeToggle) {
+  uiThemeToggle.addEventListener('click', () => {
+    const isDark = document.body.getAttribute('data-ui-theme') === 'dark';
+    if (isDark) {
+      document.body.removeAttribute('data-ui-theme');
+      localStorage.setItem('sleeve_ui_theme', 'light');
+      uiThemeToggle.textContent = '🌙 Dark Studio';
+    } else {
+      document.body.setAttribute('data-ui-theme', 'dark');
+      localStorage.setItem('sleeve_ui_theme', 'dark');
+      uiThemeToggle.textContent = '☀️ Paper Mode';
+    }
+  });
+}
+try { initUiTheme(); } catch (_) {}
 
 reset().catch(e=>status('exportStatus',e.message,true));
