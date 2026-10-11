@@ -1,8 +1,22 @@
 {
-  "name": "sleeve-album-poster-studio",
-  "version": "0.1.0",
-  "private": true,
+  "name": "album-poster-studio",
+  "version": "1.0.0",
+  "description": "Print-ready album poster studio with authentic Spotify codes, HD cover art, atmospheric aura lighting, and 300 DPI exports.",
   "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Zayanh1/album-poster-studio.git"
+  },
+  "keywords": [
+    "album-poster",
+    "spotify-codes",
+    "poster-generator",
+    "music-posters",
+    "print-ready",
+    "svg-generator",
+    "vinyl"
+  ],
   "engines": {
     "node": ">=22.9"
   },
