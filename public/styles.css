@@ -415,6 +415,11 @@ small { display: block; font-weight: 400; color: var(--muted); font-size: 10px; 
   line-height: 0;
   transition: width 0.25s ease, max-width 0.25s ease;
 }
+#poster.is-transparent {
+  background-image: linear-gradient(45deg, #cecdc5 25%, transparent 25%), linear-gradient(-45deg, #cecdc5 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #cecdc5 75%), linear-gradient(-45deg, transparent 75%, #cecdc5 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
 #poster svg { width: 100%; height: auto; display: block; }
 body.poster-zoomed #poster {
   width: min(100%, 860px);

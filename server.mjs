@@ -306,7 +306,7 @@ export async function fetchSpotifyCode(inputUriOrUrl, { transparent = true, barC
 
   // Make the Spotify Code backgroundless: remove the full-bleed solid background rect
   if (transparent) {
-    svgText = svgText.replace(/<rect\s+[^>]*width=["']400["'][^>]*height=["']100["'][^>]*\/?>\s*/i, '');
+    svgText = svgText.replace(/<rect\s+[^>]*?(?:width=["'](?:400|100%|640)["'][^>]*?height=["'](?:100|100%|160)["']|height=["'](?:100|100%|160)["'][^>]*?width=["'](?:400|100%|640)["'])[^>]*\/?>\s*/i, '');
   }
 
   // If a bar color is specified, tint the bars & Spotify logo to integrate with the poster palette

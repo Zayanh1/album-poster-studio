@@ -214,6 +214,26 @@ const THEMES = {
   terracotta: { bg: '#1b1310', text: '#f7ede2', border: '#cb6843', palette: ['#1b1310','#84432a','#cb6843','#e29578','#f7ede2'] }
 };
 
+const PAPER_MOODS = {
+  obsidian: { theme: 'dark', bg: '#0b0c0e', bg2: '#040507', text: '#f5f5f7', border: '#ffffff' },
+  cream: { theme: 'light', bg: '#f5f2eb', bg2: '#e2dcd0', text: '#1d1b18', border: '#1d1b18' },
+  newsprint: { theme: 'light', bg: '#ded8cb', bg2: '#cdc4b3', text: '#1c1a17', border: '#2a2723' },
+  polar: { theme: 'light', bg: '#ffffff', bg2: '#f0f3f6', text: '#0a0a0a', border: '#0a0a0a' },
+  dark: { theme: 'dark', bg: '#0b0c0e', bg2: '#040507', text: '#f5f5f7', border: '#ffffff' },
+  light: { theme: 'light', bg: '#f5f2eb', bg2: '#e2dcd0', text: '#1d1b18', border: '#1d1b18' }
+};
+
+function recolorCodeSvg(dataUrl, targetColor) {
+  if (!dataUrl || !dataUrl.startsWith('data:image/svg+xml;base64,') || !/^#[0-9a-f]{6}$/i.test(targetColor)) return dataUrl;
+  try {
+    const raw = atob(dataUrl.split(',')[1]);
+    const recolored = raw.replace(/fill=["'](?!none)[^"']*["']/gi, `fill="${targetColor}"`);
+    return 'data:image/svg+xml;base64,' + utf8Base64(recolored);
+  } catch {
+    return dataUrl;
+  }
+}
+
 function formatDuration(ms) {
   if (ms == null) return '';
   const totalSec = Math.floor(ms / 1000);
@@ -236,8 +256,12 @@ function syncFields(){
 function updateBg2Visibility(){
   const bg2Group = $('bg2Group');
   if (bg2Group) {
-    const show = ['linear-v','linear-d','radial'].includes(state.bgGradient);
+    const show = ['linear-v','linear-d','radial','subtle-linear','vibrant'].includes(state.bgGradient);
     bg2Group.hidden = !show;
+  }
+  const posterEl = $('poster');
+  if (posterEl) {
+    posterEl.classList.toggle('is-transparent', state.bgGradient === 'transparent');
   }
 }
 
@@ -254,7 +278,9 @@ function paintPalette(){
 function render(){
   try{
     svg=createPosterSVG(state);
-    $('poster').innerHTML=svg;
+    const posterEl=$('poster');
+    posterEl.innerHTML=svg;
+    posterEl.classList.toggle('is-transparent', state.bgGradient === 'transparent');
     const ppi=effectivePpi(state);
     const ppiEl=$('ppi');
     ppiEl.textContent=ppi?`${ppi} PPI`:'—';
@@ -339,6 +365,9 @@ for(const id of ['title','artist','date','duration','label','size','background',
   if (el) {
     el.addEventListener('input',()=>{
       state[id]=id==='borderWidth'?Number(el.value):el.value;
+      if (id === 'textColor' && state.codeDataUrl) {
+        state.codeDataUrl = recolorCodeSvg(state.codeDataUrl, state.textColor);
+      }
       render();
     });
   }
@@ -361,11 +390,16 @@ $('tracks').addEventListener('input',()=>{
 $('dpi').addEventListener('change',render);
 
 $('theme').addEventListener('change',()=>{
-  state.theme=$('theme').value;
-  state.background=state.theme==='light'?'#f3f0e7':state.palette[0];
-  state.background2=state.theme==='light'?'#e2dcd0':'#080808';
-  state.textColor=state.theme==='light'?'#222822':'#fff9ef';
-  state.borderColor=state.theme==='light'?'#222822':state.palette[4];
+  const val = $('theme').value;
+  const mood = PAPER_MOODS[val] || (val === 'light' || val === 'cream' ? PAPER_MOODS.cream : PAPER_MOODS.obsidian);
+  state.theme = mood.theme;
+  state.background = mood.bg;
+  state.background2 = mood.bg2;
+  state.textColor = mood.text;
+  state.borderColor = mood.border;
+  if (state.codeDataUrl) {
+    state.codeDataUrl = recolorCodeSvg(state.codeDataUrl, state.textColor);
+  }
   syncFields();
   render();
 });
@@ -386,6 +420,9 @@ if (palettePresetEl) {
       state.background2 = t.palette[1] || (state.theme === 'dark' ? '#080808' : '#e2dcd0');
       state.textColor = t.text;
       state.borderColor = t.border;
+    }
+    if (state.codeDataUrl) {
+      state.codeDataUrl = recolorCodeSvg(state.codeDataUrl, state.textColor);
     }
     syncFields();
     render();
@@ -789,6 +826,15 @@ function validateCodeSvg(text){
     if ((w === '400' || w === '100%' || w === '640') && (h === '100' || h === '100%' || h === '160') && (x === '0' || x === '0%') && (y === '0' || y === '0%')) {
       rect.remove();
       break;
+    }
+  }
+  // Tint imported bars and paths with active textColor for seamless integration
+  if (state && state.textColor && /^#[0-9a-f]{6}$/i.test(state.textColor)) {
+    for (const el of doc.querySelectorAll('rect, path')) {
+      const fill = el.getAttribute('fill');
+      if (fill && fill !== 'none') {
+        el.setAttribute('fill', state.textColor);
+      }
     }
   }
   return new XMLSerializer().serializeToString(doc);

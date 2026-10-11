@@ -416,6 +416,11 @@ small { display: block; font-weight: 400; color: var(--muted); font-size: 10px; 
   line-height: 0;
   transition: width 0.25s ease, max-width 0.25s ease;
 }
+#poster.is-transparent {
+  background-image: linear-gradient(45deg, #cecdc5 25%, transparent 25%), linear-gradient(-45deg, #cecdc5 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #cecdc5 75%), linear-gradient(-45deg, transparent 75%, #cecdc5 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
 #poster svg { width: 100%; height: auto; display: block; }
 body.poster-zoomed #poster {
   width: min(100%, 860px);
@@ -708,6 +713,12 @@ function createPosterSVG(state = {}) {
     bgFill = 'url(#posterBg)';
   } else if (gradMode === 'radial') {
     defsMarkup = `<defs><radialGradient id="posterBg" cx="50%" cy="32%" r="65%" fx="50%" fy="32%"><stop offset="0%" stop-color="${bg2}"/><stop offset="100%" stop-color="${bg}"/></radialGradient></defs>`;
+    bgFill = 'url(#posterBg)';
+  } else if (gradMode === 'subtle-linear') {
+    defsMarkup = `<defs><linearGradient id="posterBg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${bg}"/><stop offset="100%" stop-color="${bg2}" stop-opacity="0.88"/></linearGradient></defs>`;
+    bgFill = 'url(#posterBg)';
+  } else if (gradMode === 'vibrant') {
+    defsMarkup = `<defs><linearGradient id="posterBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${palette[1] || bg}"/><stop offset="50%" stop-color="${palette[2] || bg2}"/><stop offset="100%" stop-color="${palette[3] || palette[0] || bg}"/></linearGradient></defs>`;
     bgFill = 'url(#posterBg)';
   } else if (gradMode === 'palette') {
     defsMarkup = `<defs><linearGradient id="posterBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${palette[0]}"/><stop offset="35%" stop-color="${palette[1]}"/><stop offset="70%" stop-color="${palette[2]}"/><stop offset="100%" stop-color="${palette[3] || palette[4]}"/></linearGradient></defs>`;
@@ -1009,6 +1020,26 @@ const THEMES = {
   terracotta: { bg: '#1b1310', text: '#f7ede2', border: '#cb6843', palette: ['#1b1310','#84432a','#cb6843','#e29578','#f7ede2'] }
 };
 
+const PAPER_MOODS = {
+  obsidian: { theme: 'dark', bg: '#0b0c0e', bg2: '#040507', text: '#f5f5f7', border: '#ffffff' },
+  cream: { theme: 'light', bg: '#f5f2eb', bg2: '#e2dcd0', text: '#1d1b18', border: '#1d1b18' },
+  newsprint: { theme: 'light', bg: '#ded8cb', bg2: '#cdc4b3', text: '#1c1a17', border: '#2a2723' },
+  polar: { theme: 'light', bg: '#ffffff', bg2: '#f0f3f6', text: '#0a0a0a', border: '#0a0a0a' },
+  dark: { theme: 'dark', bg: '#0b0c0e', bg2: '#040507', text: '#f5f5f7', border: '#ffffff' },
+  light: { theme: 'light', bg: '#f5f2eb', bg2: '#e2dcd0', text: '#1d1b18', border: '#1d1b18' }
+};
+
+function recolorCodeSvg(dataUrl, targetColor) {
+  if (!dataUrl || !dataUrl.startsWith('data:image/svg+xml;base64,') || !/^#[0-9a-f]{6}$/i.test(targetColor)) return dataUrl;
+  try {
+    const raw = atob(dataUrl.split(',')[1]);
+    const recolored = raw.replace(/fill=["'](?!none)[^"']*["']/gi, `fill="${targetColor}"`);
+    return 'data:image/svg+xml;base64,' + utf8Base64(recolored);
+  } catch {
+    return dataUrl;
+  }
+}
+
 function formatDuration(ms) {
   if (ms == null) return '';
   const totalSec = Math.floor(ms / 1000);
@@ -1031,8 +1062,12 @@ function syncFields(){
 function updateBg2Visibility(){
   const bg2Group = $('bg2Group');
   if (bg2Group) {
-    const show = ['linear-v','linear-d','radial'].includes(state.bgGradient);
+    const show = ['linear-v','linear-d','radial','subtle-linear','vibrant'].includes(state.bgGradient);
     bg2Group.hidden = !show;
+  }
+  const posterEl = $('poster');
+  if (posterEl) {
+    posterEl.classList.toggle('is-transparent', state.bgGradient === 'transparent');
   }
 }
 
@@ -1049,7 +1084,9 @@ function paintPalette(){
 function render(){
   try{
     svg=createPosterSVG(state);
-    $('poster').innerHTML=svg;
+    const posterEl=$('poster');
+    posterEl.innerHTML=svg;
+    posterEl.classList.toggle('is-transparent', state.bgGradient === 'transparent');
     const ppi=effectivePpi(state);
     const ppiEl=$('ppi');
     ppiEl.textContent=ppi?`${ppi} PPI`:'—';
@@ -1134,6 +1171,9 @@ for(const id of ['title','artist','date','duration','label','size','background',
   if (el) {
     el.addEventListener('input',()=>{
       state[id]=id==='borderWidth'?Number(el.value):el.value;
+      if (id === 'textColor' && state.codeDataUrl) {
+        state.codeDataUrl = recolorCodeSvg(state.codeDataUrl, state.textColor);
+      }
       render();
     });
   }
@@ -1156,11 +1196,16 @@ $('tracks').addEventListener('input',()=>{
 $('dpi').addEventListener('change',render);
 
 $('theme').addEventListener('change',()=>{
-  state.theme=$('theme').value;
-  state.background=state.theme==='light'?'#f3f0e7':state.palette[0];
-  state.background2=state.theme==='light'?'#e2dcd0':'#080808';
-  state.textColor=state.theme==='light'?'#222822':'#fff9ef';
-  state.borderColor=state.theme==='light'?'#222822':state.palette[4];
+  const val = $('theme').value;
+  const mood = PAPER_MOODS[val] || (val === 'light' || val === 'cream' ? PAPER_MOODS.cream : PAPER_MOODS.obsidian);
+  state.theme = mood.theme;
+  state.background = mood.bg;
+  state.background2 = mood.bg2;
+  state.textColor = mood.text;
+  state.borderColor = mood.border;
+  if (state.codeDataUrl) {
+    state.codeDataUrl = recolorCodeSvg(state.codeDataUrl, state.textColor);
+  }
   syncFields();
   render();
 });
@@ -1181,6 +1226,9 @@ if (palettePresetEl) {
       state.background2 = t.palette[1] || (state.theme === 'dark' ? '#080808' : '#e2dcd0');
       state.textColor = t.text;
       state.borderColor = t.border;
+    }
+    if (state.codeDataUrl) {
+      state.codeDataUrl = recolorCodeSvg(state.codeDataUrl, state.textColor);
     }
     syncFields();
     render();
@@ -1586,6 +1634,15 @@ function validateCodeSvg(text){
       break;
     }
   }
+  // Tint imported bars and paths with active textColor for seamless integration
+  if (state && state.textColor && /^#[0-9a-f]{6}$/i.test(state.textColor)) {
+    for (const el of doc.querySelectorAll('rect, path')) {
+      const fill = el.getAttribute('fill');
+      if (fill && fill !== 'none') {
+        el.setAttribute('fill', state.textColor);
+      }
+    }
+  }
   return new XMLSerializer().serializeToString(doc);
 }
 
@@ -1709,7 +1766,7 @@ reset().catch(e=>status('exportStatus',e.message,true));
 
 <section class="control-section"><div class="section-title"><span class="step">02</span><h2>Bring your artwork</h2></div><div class="art-actions-row"><button id="autoPullArtBtn" class="primary auto-btn" type="button">⚡ Pull 3000px Art</button><button id="toggleArtSearchBtn" class="secondary" type="button">Search Covers ↗</button></div><div id="artSearchBox" class="art-search-box" hidden><form id="artSearchForm"><div class="search-row"><input id="artQuery" placeholder="Search Apple Music, CAA, Deezer..."><button id="artSearchSubmit" aria-label="Find artwork" type="submit">↗</button></div></form><div id="artworkGallery" class="artwork-gallery"></div></div><label class="upload-zone" id="dropZone" for="artFile"><span class="upload-icon">↑</span><strong>Drop your cover here</strong><span>or choose a file · PNG, JPG, WebP</span><input id="artFile" type="file" accept="image/png,image/jpeg,image/webp"></label><p class="hint">Use art you created, have permission to reproduce, or have verified is public domain. Buying an album does not grant artwork rights.</p><label class="check"><input id="rights" type="checkbox" checked><span>I have the rights needed to reproduce this artwork.</span></label><label class="quiet-label">Permission / source note <input id="licenseNote" maxlength="500" placeholder="Your artwork, license URL, or permission reference"></label><div id="artStatus" class="status" role="status"></div><div class="quality-row"><span>ARTWORK AT PRINT SIZE</span><strong id="ppi">—</strong></div><p class="hint" id="qualityHint"></p></section>
 
-<section class="control-section"><div class="section-title"><span class="step">03</span><h2>Set the mood</h2></div><div class="two-col"><label>Print size<select id="size"><option value="12x12">12 × 12 in (Square Vinyl)</option><option value="12x18">12 × 18 inches</option><option value="18x24" selected>18 × 24 inches</option><option value="24x36">24 × 36 inches</option><option value="A3">A3 (11.7 × 16.5 in)</option></select></label><label>Paper mood<select id="theme"><option value="dark">After hours</option><option value="light">Gallery cream</option></select></label></div><div class="two-col"><label>Typography style<select id="fontFamily"><option value="sans" selected>Modern Swiss (Sans)</option><option value="serif">Editorial (Serif)</option><option value="mono">Studio Archive (Mono)</option></select></label><label>Track columns<select id="columns"><option value="auto" selected>Auto (Balanced)</option><option value="1">1 Column</option><option value="2">2 Columns</option><option value="3">3 Columns</option></select></label></div><div class="two-col"><label>Artwork framing<select id="artFit"><option value="meet" selected>Fit (Full Artwork)</option><option value="slice">Fill (Square Crop)</option></select></label><label>Palette theme<select id="palettePreset"><option value="extract" selected>From Artwork</option><option value="warmVinyl">Warm Vinyl</option><option value="tokyoNeon">Tokyo Neon</option><option value="galleryCream">Gallery Cream</option><option value="obsidianGold">Obsidian & Gold</option><option value="nordicMist">Nordic Mist</option><option value="terracotta">Terracotta</option></select></label></div><div class="palette-heading"><label>Colors from your cover</label><button class="text-button" id="extract" type="button">Extract again ↻</button></div><div id="palette" class="palette"></div><div class="two-col color-row"><label>Background<input id="background" type="color" value="#14151a"></label><label>Text<input id="textColor" type="color" value="#ffffff"></label></div><div class="two-col color-row gradient-row"><label>Background style<select id="bgGradient"><option value="none" selected>Solid color</option><option value="transparent">Transparent (Backgroundless)</option><option value="linear-v">Vertical fade</option><option value="linear-d">Diagonal fade (45°)</option><option value="radial">Ambient spotlight (Soft Radial)</option><option value="palette">Cover palette blend</option><option value="duotone">Palette duotone</option></select></label><div id="bg2Group" hidden><label>Gradient 2nd color<input id="background2" type="color" value="#080808"></label></div></div><div class="border-control"><label for="borderWidth">Artwork border <output id="borderValue">8 px</output></label><div class="range-row"><input id="borderWidth" type="range" min="0" max="24" value="8"><input id="borderColor" aria-label="Border color" type="color" value="#ede6d5"></div></div></section>
+<section class="control-section"><div class="section-title"><span class="step">03</span><h2>Set the mood</h2></div><div class="two-col"><label>Print size<select id="size"><option value="12x12">12 × 12 in (Square Vinyl)</option><option value="12x18">12 × 18 inches</option><option value="18x24" selected>18 × 24 inches</option><option value="24x36">24 × 36 inches</option><option value="A3">A3 (11.7 × 16.5 in)</option></select></label><label>Paper mood<select id="theme"><option value="obsidian" selected>Obsidian (After hours)</option><option value="cream">Gallery cream</option><option value="newsprint">Vintage newsprint</option><option value="polar">Polar white</option></select></label></div><div class="two-col"><label>Typography style<select id="fontFamily"><option value="sans" selected>Modern Swiss (Sans)</option><option value="serif">Editorial (Serif)</option><option value="mono">Studio Archive (Mono)</option></select></label><label>Track columns<select id="columns"><option value="auto" selected>Auto (Balanced)</option><option value="1">1 Column</option><option value="2">2 Columns</option><option value="3">3 Columns</option></select></label></div><div class="two-col"><label>Artwork framing<select id="artFit"><option value="meet" selected>Fit (Full Artwork)</option><option value="slice">Fill (Square Crop)</option></select></label><label>Palette theme<select id="palettePreset"><option value="extract" selected>From Artwork</option><option value="warmVinyl">Warm Vinyl</option><option value="tokyoNeon">Tokyo Neon</option><option value="galleryCream">Gallery Cream</option><option value="obsidianGold">Obsidian & Gold</option><option value="nordicMist">Nordic Mist</option><option value="terracotta">Terracotta</option></select></label></div><div class="palette-heading"><label>Colors from your cover</label><button class="text-button" id="extract" type="button">Extract again ↻</button></div><div id="palette" class="palette"></div><div class="two-col color-row"><label>Background<input id="background" type="color" value="#14151a"></label><label>Text<input id="textColor" type="color" value="#ffffff"></label></div><div class="two-col color-row gradient-row"><label>Background style<select id="bgGradient"><option value="none" selected>Solid color</option><option value="transparent">Transparent (Backgroundless)</option><option value="linear-v">Vertical fade</option><option value="linear-d">Diagonal fade (45°)</option><option value="subtle-linear">Subtle linear fade</option><option value="radial">Ambient spotlight (Soft Radial)</option><option value="vibrant">Vibrant accent blend</option><option value="palette">Cover palette blend</option><option value="duotone">Palette duotone</option></select></label><div id="bg2Group" hidden><label>Gradient 2nd color<input id="background2" type="color" value="#080808"></label></div></div><div class="border-control"><label for="borderWidth">Artwork border <output id="borderValue">8 px</output></label><div class="range-row"><input id="borderWidth" type="range" min="0" max="24" value="8"><input id="borderColor" aria-label="Border color" type="color" value="#ede6d5"></div></div></section>
 
 <section class="control-section"><div class="section-title"><span class="step">04</span><h2>Add a real Spotify Code</h2><span class="optional">OPTIONAL</span></div><label>Spotify album link or URI<input id="spotifyUrl" placeholder="https://open.spotify.com/album/…" maxlength="250"></label><div class="code-actions"><button id="autoPullCodeBtn" class="primary auto-btn" type="button">⚡ Auto-pull Code</button><button id="copyUri" class="secondary" type="button">Copy URI</button><a class="secondary" href="https://www.spotifycodes.com/" target="_blank" rel="noopener noreferrer">Official generator ↗</a></div><p class="hint">Auto-pull downloads the genuine Spotify Code directly from Spotify. Unmodified official asset.</p><label class="file-button">Import official Code<input id="codeFile" type="file" accept="image/svg+xml,image/png"></label><button id="removeCode" class="text-button" type="button" hidden>Remove Code</button><div id="codeStatus" class="status" role="status"></div><label class="check"><input id="codeConfirmed" type="checkbox"><span>I scanned this Code in Spotify and confirmed it opens the album above.</span></label><p class="notice">Spotify prohibits Codes on products sold. Adding a Code does not grant rights to the album art. <a href="https://www.spotifycodes.com/assets/Terms_and_Conditions_for_Spotify_Codes_2025_10_09.pdf" target="_blank" rel="noopener noreferrer">Read terms ↗</a></p></section>
 </aside>

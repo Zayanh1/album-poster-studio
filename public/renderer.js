@@ -133,6 +133,12 @@ export function createPosterSVG(state = {}) {
   } else if (gradMode === 'radial') {
     defsMarkup = `<defs><radialGradient id="posterBg" cx="50%" cy="32%" r="65%" fx="50%" fy="32%"><stop offset="0%" stop-color="${bg2}"/><stop offset="100%" stop-color="${bg}"/></radialGradient></defs>`;
     bgFill = 'url(#posterBg)';
+  } else if (gradMode === 'subtle-linear') {
+    defsMarkup = `<defs><linearGradient id="posterBg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${bg}"/><stop offset="100%" stop-color="${bg2}" stop-opacity="0.88"/></linearGradient></defs>`;
+    bgFill = 'url(#posterBg)';
+  } else if (gradMode === 'vibrant') {
+    defsMarkup = `<defs><linearGradient id="posterBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${palette[1] || bg}"/><stop offset="50%" stop-color="${palette[2] || bg2}"/><stop offset="100%" stop-color="${palette[3] || palette[0] || bg}"/></linearGradient></defs>`;
+    bgFill = 'url(#posterBg)';
   } else if (gradMode === 'palette') {
     defsMarkup = `<defs><linearGradient id="posterBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${palette[0]}"/><stop offset="35%" stop-color="${palette[1]}"/><stop offset="70%" stop-color="${palette[2]}"/><stop offset="100%" stop-color="${palette[3] || palette[4]}"/></linearGradient></defs>`;
     bgFill = 'url(#posterBg)';
