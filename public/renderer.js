@@ -118,12 +118,38 @@ export function createPosterSVG(state = {}) {
   const art = dataImage(state.artDataUrl), code = dataImage(state.codeDataUrl, true);
   const fontChoice = state.fontFamily === 'serif' ? 'Georgia, "Times New Roman", Garamond, serif' : state.fontFamily === 'mono' ? '"SF Mono", Menlo, Consolas, Monaco, monospace' : 'Arial, Helvetica, sans-serif';
   const artFit = state.artFit === 'slice' ? 'xMidYMid slice' : 'xMidYMid meet';
+  const ax = (1080 - artSize) / 2, ay = 54;
 
   let bgFill = bg;
   let defsMarkup = '';
+  let auraLayer = '';
   const gradMode = state.bgGradient || 'none';
   if (gradMode === 'transparent' || gradMode === 'backgroundless') {
     bgFill = 'none';
+  } else if (gradMode === 'art-aura' || gradMode === 'aura') {
+    defsMarkup = `<defs>
+      <filter id="artAuraBlur" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="96"/>
+        <feColorMatrix type="matrix" values="1.2 0 0 0 0  0 1.2 0 0 0  0 0 1.2 0 0  0 0 0 0.82 0"/>
+      </filter>
+      <linearGradient id="auraShade" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#070709" stop-opacity="0.82"/>
+        <stop offset="28%" stop-color="#070709" stop-opacity="0.10"/>
+        <stop offset="62%" stop-color="#070709" stop-opacity="0.72"/>
+        <stop offset="100%" stop-color="#070709" stop-opacity="0.95"/>
+      </linearGradient>
+      <clipPath id="auraClip"><rect width="1080" height="${h}"/></clipPath>
+    </defs>`;
+    bgFill = palette[0] || bg;
+    if (art) {
+      const auraScale = artSize * 1.38;
+      const auraX = (1080 - auraScale) / 2;
+      const auraY = ay - (auraScale - artSize) * 0.45;
+      auraLayer = `<g clip-path="url(#auraClip)"><image x="${auraX}" y="${auraY}" width="${auraScale}" height="${auraScale}" preserveAspectRatio="${artFit}" filter="url(#artAuraBlur)" xlink:href="${art}"/><rect width="1080" height="${h}" fill="url(#auraShade)"/></g>`;
+    }
+  } else if (gradMode === 'cinema-glow') {
+    defsMarkup = `<defs><radialGradient id="posterBg" cx="50%" cy="32%" r="68%"><stop offset="0%" stop-color="${palette[1] || bg2}" stop-opacity="0.9"/><stop offset="48%" stop-color="${palette[2] || bg}" stop-opacity="0.5"/><stop offset="100%" stop-color="${palette[0] || '#08080a'}"/></radialGradient></defs>`;
+    bgFill = 'url(#posterBg)';
   } else if (gradMode === 'linear-v') {
     defsMarkup = `<defs><linearGradient id="posterBg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${bg}"/><stop offset="100%" stop-color="${bg2}"/></linearGradient></defs>`;
     bgFill = 'url(#posterBg)';
@@ -151,10 +177,10 @@ export function createPosterSVG(state = {}) {
     `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${l.inches[0]}in" height="${l.inches[1]}in" viewBox="0 0 1080 ${h}" role="img" aria-label="${escapeXML(plain(state.title || 'Album poster'))}">`,
     defsMarkup,
     `<title>${escapeXML(plain(state.title || 'Album poster'))} — ${escapeXML(plain(state.artist))}</title>`,
-    `<rect width="1080" height="${h}" fill="${bgFill}"/>`
+    `<rect width="1080" height="${h}" fill="${bgFill}"/>`,
+    auraLayer
   ].filter(Boolean);
   const text = (str, x, y, size, options = {}) => parts.push(`<text x="${x}" y="${y}" fill="${ink}" font-family="${fontChoice}" font-size="${size.toFixed(3)}"${options.bold ? ' font-weight="700"' : ''}${options.opacity ? ` opacity="${options.opacity}"` : ''}${options.spacing ? ` letter-spacing="${options.spacing}"` : ''}>${escapeXML(str)}</text>`);
-  const ax = (1080-artSize)/2, ay = 54;
   parts.push(`<rect x="${ax}" y="${ay}" width="${artSize}" height="${artSize}" fill="${border}"/>`);
   if (art) parts.push(`<image x="${ax+bw}" y="${ay+bw}" width="${artSize-2*bw}" height="${artSize-2*bw}" preserveAspectRatio="${artFit}" xlink:href="${art}"/>`);
   else { text('YOUR ALBUM ART', ax+artSize*.13, ay+artSize*.52, fit('YOUR ALBUM ART',artSize*.74,40), {bold:true}); }
@@ -164,9 +190,11 @@ export function createPosterSVG(state = {}) {
   text(title, left, titleY, titleSize, {bold:true});
   const artist = plain(state.artist || 'ARTIST NAME', 160);
   text(artist, left, titleY+37, fit(artist,710,23), {opacity:.82});
-  const swatchW = 34, swatchGap = 7;
-  const rx = state.swatchStyle === 'pill' ? 11 : 3;
-  palette.forEach((c,i) => parts.push(`<rect x="${1026-palette.length*(swatchW+swatchGap)+swatchGap+i*(swatchW+swatchGap)}" y="${titleY+16}" width="${swatchW}" height="22" rx="${rx}" ry="${rx}" fill="${c}"/>`));
+  const swatchW = 34, swatchGap = 3;
+  const rx = state.swatchStyle === 'pill' ? 11 : 2;
+  const totalSwatchesW = palette.length * swatchW + (palette.length - 1) * swatchGap;
+  const startX = 1026 - totalSwatchesW;
+  palette.forEach((c,i) => parts.push(`<rect x="${startX + i * (swatchW + swatchGap)}" y="${titleY+14}" width="${swatchW}" height="24" rx="${rx}" ry="${rx}" fill="${c}"/>`));
   const ruleY = titleY+64;
   parts.push(`<path d="M54 ${ruleY}H1026" stroke="${ink}" stroke-width="2"/>`);
   const contentY = ruleY+35;
@@ -198,7 +226,7 @@ export function createPosterSVG(state = {}) {
   }
   parts.push('</svg>'); return parts.join('\n');
 }
-/** Small deterministic median-cut-style palette; all pixels are sampled locally. */
+/** Chroma-weighted deterministic palette extraction ensuring vibrant artwork colors are prioritized. */
 export function extractPalette(image) {
   const canvas = typeof document !== 'undefined' ? document.createElement('canvas') : null;
   if (!canvas) throw new Error('Palette extraction requires a browser canvas.');
@@ -212,11 +240,28 @@ export function extractPalette(image) {
     const rgb=[pixels[i],pixels[i+1],pixels[i+2]], key=rgb.map(v=>v>>5).join(',');
     const b=bins.get(key)||{n:0,r:0,g:0,b:0}; b.n++; b.r+=rgb[0];b.g+=rgb[1];b.b+=rgb[2]; bins.set(key,b);
   }
-  const ranked=[...bins.values()].sort((a,b)=>b.n-a.n).map(b=>[b.r/b.n,b.g/b.n,b.b/b.n]);
-  const chosen=[];
-  for(const rgb of ranked) { if(chosen.every(c=>c.reduce((sum,v,i)=>sum+(v-rgb[i])**2,0)>2600)) chosen.push(rgb); if(chosen.length===5) break; }
-  for(const rgb of ranked) { if(chosen.length===5) break; if(!chosen.includes(rgb))chosen.push(rgb); }
+  // Weight bins by both pixel frequency and color chroma (saturation), ensuring rich hues are captured
+  const ranked = [...bins.values()].map(b => {
+    const r = b.r / b.n, g = b.g / b.n, bl = b.b / b.n;
+    const max = Math.max(r, g, bl), min = Math.min(r, g, bl);
+    const chroma = max - min;
+    const score = b.n * (1 + (chroma / 28) ** 1.35);
+    return { rgb: [r, g, bl], chroma, n: b.n, score };
+  }).sort((a,b) => b.score - a.score).map(b => b.rgb);
+
+  const chosen = [];
+  for(const rgb of ranked) {
+    if(chosen.every(c => c.reduce((sum,v,i)=>sum+(v-rgb[i])**2,0) > 2200)) {
+      chosen.push(rgb);
+    }
+    if(chosen.length === 5) break;
+  }
+  for(const rgb of ranked) {
+    if(chosen.length === 5) break;
+    if(!chosen.includes(rgb)) chosen.push(rgb);
+  }
   if (!chosen.length) chosen.push([127,127,127]);
-  while(chosen.length<5) chosen.push(chosen[chosen.length-1]);
-  return chosen.sort((a,b)=>a.reduce((s,v)=>s+v,0)-b.reduce((s,v)=>s+v,0)).map(rgb=>'#'+rgb.map(v=>Math.round(v).toString(16).padStart(2,'0')).join(''));
+  while(chosen.length < 5) chosen.push(chosen[chosen.length-1]);
+  return chosen.sort((a,b) => a.reduce((s,v)=>s+v,0) - b.reduce((s,v)=>s+v,0)).map(rgb => '#' + rgb.map(v => Math.round(v).toString(16).padStart(2,'0')).join(''));
 }
+

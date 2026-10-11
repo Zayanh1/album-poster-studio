@@ -98,7 +98,65 @@ function demoArtOKComputer(){
   return c.toDataURL('image/png');
 }
 
+function demoArtLifeOfADon(){
+  const c=document.createElement('canvas');c.width=c.height=1800;const x=c.getContext('2d');
+  // Deep black room
+  x.fillStyle='#090709';x.fillRect(0,0,1800,1800);
+  // Red carpet angular beam
+  x.save();
+  x.beginPath();
+  x.moveTo(0,680);x.lineTo(1800,280);x.lineTo(1800,1350);x.lineTo(0,1750);x.closePath();
+  const carpetGrad = x.createLinearGradient(0,680,1800,1350);
+  carpetGrad.addColorStop(0,'#a81414');
+  carpetGrad.addColorStop(0.45,'#cf1c1c');
+  carpetGrad.addColorStop(1,'#6b0b0b');
+  x.fillStyle=carpetGrad;x.fill();
+  x.restore();
+  // Warm spotlight & shadows
+  const spot = x.createRadialGradient(920,860,120,920,860,750);
+  spot.addColorStop(0,'rgba(255,140,80,0.32)');
+  spot.addColorStop(0.6,'rgba(180,20,20,0.16)');
+  spot.addColorStop(1,'rgba(0,0,0,0.85)');
+  x.fillStyle=spot;x.fillRect(0,0,1800,1800);
+  // Leather couch / silhouette
+  x.fillStyle='#121114';
+  x.beginPath();
+  x.ellipse(960,860,260,150,-0.2,0,Math.PI*2);
+  x.fill();
+  x.fillStyle='#1e1a20';
+  x.beginPath();
+  x.ellipse(910,810,180,90,-0.2,0,Math.PI*2);
+  x.fill();
+  // Parental Advisory badge
+  x.fillStyle='#ffffff';x.fillRect(1440,1520,240,140);
+  x.fillStyle='#000000';x.fillRect(1446,1526,228,128);
+  x.fillStyle='#ffffff';x.font='bold 22px sans-serif';x.fillText('PARENTAL',1490,1570);
+  x.font='bold 16px sans-serif';x.fillText('ADVISORY',1500,1610);
+  return c.toDataURL('image/png');
+}
+
 const PRESETS = {
+  lifeOfADon: {
+    name: 'Life of a DON',
+    title: 'Life of a DON',
+    artist: 'Don Toliver',
+    date: 'October 8, 2021',
+    duration: '51:34',
+    tracks: ['XSCAPE','5X','Way Bigger','Flocky Flocky','What You Need','Double Standards',"Swang'n On Westheimer",'Drugs N Hella Melodies','2AM','Get Throwed','Company, Pt. 2','OUTERSPACE','Smoke','You','Crossfaded','BOGUS'],
+    palette: ['#120708','#8e1717','#cc2222','#df7b42','#f3ede3'],
+    background: '#0d0608',
+    background2: '#8e1717',
+    bgGradient: 'art-aura',
+    textColor: '#ffffff',
+    borderColor: '#ffffff',
+    borderWidth: 0,
+    theme: 'dark',
+    fontFamily: 'sans',
+    columns: '2',
+    size: '18x24',
+    spotifyUrl: 'https://open.spotify.com/album/1pPnFk52kHQG6e2YF21h5w',
+    generator: demoArtLifeOfADon
+  },
   slowOrbit: {
     name: 'Slow Orbit (Demo)',
     title: 'SLOW ORBIT',
@@ -272,7 +330,7 @@ function syncFields(){
 function updateBg2Visibility(){
   const bg2Group = $('bg2Group');
   if (bg2Group) {
-    const show = ['linear-v','linear-d','radial','subtle-linear','vibrant'].includes(state.bgGradient);
+    const show = ['linear-v','linear-d','radial','subtle-linear','vibrant','cinema-glow'].includes(state.bgGradient);
     bg2Group.hidden = !show;
   }
   const posterEl = $('poster');
@@ -543,15 +601,21 @@ async function applyArt(file){
     state.artHeight=image.naturalHeight;
     artImage=image;
     state.palette=extractPalette(image);
-    state.background=state.theme==='dark'?state.palette[0]:'#f3f0e7';
-    state.borderColor=state.theme==='dark'?state.palette[4]:'#222822';
+    state.bgGradient='art-aura';
+    state.background=state.palette[0];
+    state.background2=state.palette[1] || '#991c1c';
+    state.textColor='#ffffff';
+    state.borderColor=state.borderWidth > 0 ? (state.palette[4] || '#ffffff') : '#ffffff';
+    if (state.codeDataUrl) {
+      state.codeDataUrl = recolorCodeSvg(state.codeDataUrl, state.textColor);
+    }
     $('rights').checked=false;
     $('licenseNote').value='';
     $('previewCaption').textContent='YOUR ARTWORK · PROCESSED ON THIS DEVICE';
     document.querySelectorAll('.preset-chip').forEach(btn => btn.classList.remove('active'));
     syncFields();
     render();
-    status('artStatus',`${file.name} · ${image.naturalWidth} × ${image.naturalHeight} pixels. Colors extracted.`);
+    status('artStatus',`${file.name} · ${image.naturalWidth} × ${image.naturalHeight} px. Matched colors & ambient aura glow.`);
   }catch(e){
     status('artStatus',e.message,true);
   }
@@ -564,10 +628,16 @@ for(const ev of ['dragleave','drop'])$('dropZone').addEventListener(ev,e=>{e.pre
 $('extract').addEventListener('click',()=>{
   if (!artImage) return;
   state.palette=extractPalette(artImage);
-  state.background=state.theme==='dark'?state.palette[0]:'#f3f0e7';
-  state.borderColor=state.theme==='dark'?state.palette[4]:'#222822';
+  state.bgGradient='art-aura';
+  state.background=state.palette[0];
+  state.background2=state.palette[1] || '#991c1c';
+  state.textColor='#ffffff';
+  if (state.codeDataUrl) {
+    state.codeDataUrl = recolorCodeSvg(state.codeDataUrl, state.textColor);
+  }
   syncFields();
   render();
+  status('exportStatus','✓ Colors re-extracted and matched with atmospheric ambient aura glow.');
 });
 
 async function api(path){
