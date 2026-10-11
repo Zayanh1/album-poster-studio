@@ -653,10 +653,15 @@ async function autoPullSpotifyCode(spotifyUrlOrUri) {
     if (location.protocol === 'file:') {
       const res = await fetch(`https://scannables.scdn.co/uri/plain/svg/000000/white/640/${encodeURIComponent(uri)}`);
       if (!res.ok) throw new Error('Spotify returned error: ' + res.status);
-      const text = await res.text();
+      let text = await res.text();
+      text = text.replace(/<rect\s+[^>]*width=["']400["'][^>]*height=["']100["'][^>]*\/?>\s*/i, '');
+      if (state.textColor && /^#[0-9a-f]{6}$/i.test(state.textColor)) {
+        text = text.replace(/fill=["']#ffffff["']/gi, `fill="${state.textColor}"`);
+      }
       dataUrl = 'data:image/svg+xml;base64,' + utf8Base64(text);
     } else {
-      const res = await api(`/api/spotify-code?uri=${encodeURIComponent(uri)}`);
+      const colorParam = state.textColor ? `&color=${encodeURIComponent(state.textColor)}` : '';
+      const res = await api(`/api/spotify-code?uri=${encodeURIComponent(uri)}${colorParam}`);
       dataUrl = res.dataUrl;
     }
     const img = await loadImage(dataUrl);
@@ -666,7 +671,7 @@ async function autoPullSpotifyCode(spotifyUrlOrUri) {
     $('codeConfirmed').checked = true;
     $('removeCode').hidden = false;
     render();
-    status('codeStatus', '✓ Official Spotify Code pulled directly from Spotify CDN.');
+    status('codeStatus', '✓ Official Spotify Code pulled directly from Spotify CDN (backgroundless).');
   } catch (err) {
     status('codeStatus', `Could not pull Spotify Code: ${err.message}`, true);
   }
@@ -775,7 +780,18 @@ function validateCodeSvg(text){
       if(/(?:^|:)href$/.test(a.name)&&!/^#[\w.-]+$/.test(a.value))throw new Error('External SVG references are not allowed.');
     }
   }
-  return text;
+  // Remove background rect so imported code is clean and backgroundless
+  for (const rect of doc.querySelectorAll('rect')) {
+    const w = rect.getAttribute('width');
+    const h = rect.getAttribute('height');
+    const x = rect.getAttribute('x') || '0';
+    const y = rect.getAttribute('y') || '0';
+    if ((w === '400' || w === '100%' || w === '640') && (h === '100' || h === '100%' || h === '160') && (x === '0' || x === '0%') && (y === '0' || y === '0%')) {
+      rect.remove();
+      break;
+    }
+  }
+  return new XMLSerializer().serializeToString(doc);
 }
 
 $('codeFile').addEventListener('change',async e=>{

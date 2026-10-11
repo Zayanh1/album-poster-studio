@@ -122,7 +122,9 @@ export function createPosterSVG(state = {}) {
   let bgFill = bg;
   let defsMarkup = '';
   const gradMode = state.bgGradient || 'none';
-  if (gradMode === 'linear-v') {
+  if (gradMode === 'transparent' || gradMode === 'backgroundless') {
+    bgFill = 'none';
+  } else if (gradMode === 'linear-v') {
     defsMarkup = `<defs><linearGradient id="posterBg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${bg}"/><stop offset="100%" stop-color="${bg2}"/></linearGradient></defs>`;
     bgFill = 'url(#posterBg)';
   } else if (gradMode === 'linear-d') {

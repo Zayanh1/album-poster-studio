@@ -287,7 +287,7 @@ export async function searchSpotifyAlbum(query, releaseGroupId = '') {
 }
 
 
-export async function fetchSpotifyCode(inputUriOrUrl) {
+export async function fetchSpotifyCode(inputUriOrUrl, { transparent = true, barColor = '' } = {}) {
   let uri = String(inputUriOrUrl || '').trim();
   if (uri.startsWith('http')) {
     const m = uri.match(/album\/([A-Za-z0-9]{22})/);
@@ -299,10 +299,21 @@ export async function fetchSpotifyCode(inputUriOrUrl) {
   const codeUrl = `https://scannables.scdn.co/uri/plain/svg/000000/white/640/${encodeURIComponent(uri)}`;
   const res = await fetch(codeUrl, { signal: AbortSignal.timeout(8000) });
   if (!res.ok) throw new ApiError(502, 'Could not fetch Spotify code from Spotify servers.');
-  const svgText = await res.text();
+  let svgText = await res.text();
   if (!svgText.trim().startsWith('<svg') || svgText.includes('<script')) {
     throw new ApiError(502, 'Received invalid SVG code from Spotify.');
   }
+
+  // Make the Spotify Code backgroundless: remove the full-bleed solid background rect
+  if (transparent) {
+    svgText = svgText.replace(/<rect\s+[^>]*width=["']400["'][^>]*height=["']100["'][^>]*\/?>\s*/i, '');
+  }
+
+  // If a bar color is specified, tint the bars & Spotify logo to integrate with the poster palette
+  if (barColor && /^#[0-9a-f]{6}$/i.test(barColor)) {
+    svgText = svgText.replace(/fill=["']#ffffff["']/gi, `fill="${barColor}"`);
+  }
+
   return {
     uri,
     dataUrl: `data:image/svg+xml;base64,${Buffer.from(svgText).toString('base64')}`,
@@ -369,12 +380,14 @@ export function createAppServer({ fetchImpl, userAgent, mbIntervalMs = 1100, pub
         let uri = (url.searchParams.get('uri') || url.searchParams.get('url') || '').trim();
         const q = (url.searchParams.get('q') || '').trim();
         const id = (url.searchParams.get('id') || '').trim();
+        const barColor = (url.searchParams.get('color') || '').trim();
+        const transparent = url.searchParams.get('bg') !== 'opaque';
         if (!uri && (q || id)) {
           const found = await searchSpotifyAlbum(q, id);
           if (found.found) uri = found.uri;
         }
         if (!uri) throw new ApiError(400, 'Spotify album URI or URL required.');
-        return json(200, await fetchSpotifyCode(uri));
+        return json(200, await fetchSpotifyCode(uri, { transparent, barColor }));
       }
       if (url.pathname === '/api/proxy-image') {
         const imgUrl = (url.searchParams.get('url') || '').trim();
