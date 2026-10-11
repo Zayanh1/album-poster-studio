@@ -1,0 +1,1700 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#eeeae2"><title>Sleeve — Album Poster Studio</title><style>:root {
+  --paper: #f1eee7;
+  --ink: #252823;
+  --muted: #777a70;
+  --line: #d8d8cd;
+  --green: #c9e78e;
+  --green-hover: #bce077;
+  --panel: #faf8f2;
+  --accent: #5e7935;
+  --surface-hover: #eae8df;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-poster: 0 16px 36px -8px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.08);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select, textarea { font: inherit; }
+button, a, input, select, summary { touch-action: manipulation; }
+button, a, summary, label.upload-zone { -webkit-tap-highlight-color: transparent; }
+button { cursor: pointer; transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.08s ease; }
+button:disabled { opacity: .5; cursor: wait; }
+a { color: inherit; text-decoration: none; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible {
+  outline: 3px solid #719b39;
+  outline-offset: 3px;
+}
+.masthead {
+  height: 86px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  padding: 0 5%;
+  gap: 44px;
+}
+.wordmark {
+  font-size: 32px;
+  letter-spacing: -2px;
+  font-weight: 800;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.record-icon {
+  font-size: 29px;
+  letter-spacing: 0;
+  vertical-align: 1px;
+  margin-right: 6px;
+  color: #384232;
+}
+.wordmark-dot { color: #7a9238; }
+.header-note { font-size: 10px; letter-spacing: 2px; font-weight: 600; color: #6a7062; }
+.privacy { margin-left: auto; font-size: 11px; color: #676d60; display: inline-flex; align-items: center; }
+.privacy i, .stage-toolbar i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  background: #789950;
+  border-radius: 100%;
+  margin-right: 8px;
+  box-shadow: 0 0 0 2px rgba(120, 153, 80, 0.2);
+}
+main { max-width: 1640px; margin: auto; padding: 0 5%; }
+.intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 48px 0 34px;
+}
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  font-weight: 700;
+  color: #6a745c;
+  margin-bottom: 8px;
+}
+h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  font-size: clamp(32px, 4vw, 56px);
+  letter-spacing: -1.5px;
+  margin: 0;
+  line-height: 1.15;
+}
+.intro p { color: var(--muted); font-size: 15px; margin: 10px 0 0; }
+.intro-note {
+  font-size: 11px;
+  line-height: 1.85;
+  color: #767a6d;
+  text-align: right;
+  border-right: 2px solid #b5be9e;
+  padding-right: 18px;
+}
+.workspace {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 26px;
+  align-items: start;
+}
+.controls {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.control-section { padding: 22px 24px; border-bottom: 1px solid var(--line); }
+.control-section:last-child { border: 0; }
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+h2 { font-size: 15px; letter-spacing: -.3px; margin: 0; font-weight: 700; }
+.step { font-size: 10px; color: #798364; letter-spacing: 1px; font-weight: 700; }
+.optional { font-size: 8px; color: var(--muted); margin-left: auto; letter-spacing: 1px; font-weight: 700; }
+.presets-block { margin-bottom: 14px; }
+.presets-label {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+.presets-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.preset-chip {
+  background: #edeae2;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: all 0.15s ease;
+}
+.preset-chip:hover {
+  background: #e1ded3;
+  border-color: #adb69b;
+}
+.preset-chip.active {
+  background: #252823;
+  color: #f7f5ed;
+  border-color: #252823;
+}
+label { display: block; font-size: 11px; font-weight: 600; color: #363a32; }
+input:not([type=checkbox]):not([type=range]):not([type=color]), select, textarea {
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #fffefa;
+  width: 100%;
+  padding: 9px 11px;
+  margin-top: 6px;
+  color: var(--ink);
+  font-size: 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+input:not([type=checkbox]):not([type=range]):not([type=color]):focus, select:focus, textarea:focus {
+  border-color: #799a45;
+  box-shadow: 0 0 0 2px rgba(121, 154, 69, 0.15);
+}
+input::placeholder { color: #9c9f95; }
+textarea { resize: vertical; line-height: 1.5; font-family: inherit; }
+.search-row { display: flex; margin-top: 6px; }
+.search-row input { margin-top: 0!important; border-radius: 5px 0 0 5px!important; }
+.search-row button {
+  background: var(--ink);
+  color: #fff;
+  border: 0;
+  font-size: 20px;
+  width: 44px;
+  border-radius: 0 5px 5px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.search-row button:hover { background: #3b4237; }
+.hint { font-size: 10px; line-height: 1.6; color: var(--muted); margin: 8px 0; }
+.status {
+  font-size: 11px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+.status:empty { display: none; padding: 0; margin: 0; }
+.status.error { color: #8e2a16; background: #faeae7; border-left: 3px solid #d94829; }
+.status.success { color: #33531b; background: #edf5e3; border-left: 3px solid #6b9e38; }
+.search-results { display: grid; gap: 6px; margin: 10px 0; max-height: 240px; overflow-y: auto; }
+.search-result {
+  background: #efeee6;
+  border: 1px solid var(--line);
+  text-align: left;
+  padding: 9px 11px;
+  border-radius: 5px;
+  font-size: 12px;
+  transition: all 0.15s ease;
+}
+.search-result strong, .search-result span { display: block; }
+.search-result span { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.search-result:hover { border-color: #738858; background: #e8eddd; }
+details { margin-top: 14px; border-top: 1px dashed var(--line); padding-top: 10px; }
+summary {
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  list-style: none;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 0;
+  color: #4b5244;
+}
+summary::-webkit-details-marker { display: none; }
+.fields { display: grid; gap: 12px; margin-top: 14px; }
+.fields a { font-size: 10px; color: #587131; font-weight: 600; }
+small { display: block; font-weight: 400; color: var(--muted); font-size: 10px; margin-top: 2px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-top: 6px; }
+.upload-zone {
+  border: 1.5px dashed #a5b090;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 22px 14px;
+  cursor: pointer;
+  background: #edf0e4;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+.upload-zone:hover { background: #e4e9d8; border-color: #7f9952; }
+.upload-zone.dragging { background: #deecbe; border-color: #64862f; outline: 2px solid #7e9b47; }
+.upload-zone strong { font-size: 12px; font-weight: 700; }
+.upload-zone > span:last-of-type { font-size: 10px; color: var(--muted); font-weight: 400; }
+.upload-icon { font-size: 22px; font-weight: 400; line-height: 1; color: #576b3a; }
+.upload-zone input, .file-button input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.upload-zone:focus-within, .file-button:focus-within { outline: 3px solid #719b39; }
+.check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 10px;
+  line-height: 1.6;
+  font-weight: 400;
+  margin-top: 14px;
+}
+.check input { accent-color: #6c873c; margin: 3px 0 0; flex: none; }
+.quiet-label { font-size: 10px; color: var(--muted); font-weight: 400; margin-top: 10px; }
+.quality-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  font-size: 9px;
+  letter-spacing: .8px;
+  align-items: center;
+  font-weight: 700;
+  color: #676e5f;
+}
+.ppi-badge {
+  font-size: 11px;
+  letter-spacing: 0;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: #e2e1d7;
+  color: #3b4237;
+}
+.ppi-badge.ppi-excellent { background: #dff2c4; color: #284c13; }
+.ppi-badge.ppi-good { background: #fef0c7; color: #853b0a; }
+.ppi-badge.ppi-low { background: #fae0dc; color: #8e2315; }
+.palette-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+.text-button {
+  border: 0;
+  background: transparent;
+  font-size: 10px;
+  text-decoration: underline;
+  color: #5d7044;
+  padding: 0;
+  font-weight: 600;
+}
+.palette { display: flex; gap: 7px; margin: 10px 0 14px; }
+.palette input {
+  width: calc(20% - 6px);
+  height: 32px;
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 4px;
+  background: transparent;
+  padding: 0;
+}
+.color-row input[type=color] {
+  display: block;
+  width: 100%;
+  height: 32px;
+  border: 1px solid var(--line);
+  padding: 2px;
+  border-radius: 4px;
+  margin-top: 6px;
+  background: #fff;
+}
+.gradient-row {
+  margin-top: 10px;
+}
+.gradient-row:has(#bg2Group[hidden]) {
+  grid-template-columns: 1fr;
+}
+.border-control { margin-top: 16px; }
+.border-control label { display: flex; justify-content: space-between; }
+.border-control output { font-weight: 400; color: var(--muted); }
+.range-row { display: flex; gap: 12px; align-items: center; margin-top: 8px; }
+.range-row input[type=range] { width: 100%; accent-color: #68853b; cursor: pointer; }
+.range-row input[type=color] { width: 36px; height: 30px; border: 1px solid var(--line); border-radius: 4px; background: #fff; padding: 2px; }
+.code-actions { display: flex; gap: 8px; margin-top: 10px; }
+.code-actions .secondary { font-size: 10px; padding: 7px 12px; }
+.secondary, .primary, .file-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 5px;
+  border: 1px solid var(--line);
+  background: #fbf9f4;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.primary {
+  background: var(--green);
+  border-color: #b5d774;
+  color: #1f271c;
+}
+.secondary:hover { background: #eae8dd; }
+.primary:hover { background: var(--green-hover); border-color: #a7cc5e; }
+.file-button { width: 100%; margin: 6px 0 8px; font-size: 11px; background: #eeede3; }
+.notice {
+  font-size: 10px;
+  line-height: 1.6;
+  color: #735d38;
+  background: #f4eee2;
+  border-left: 3px solid #c7af78;
+  padding: 9px 11px;
+  margin: 12px 0 0;
+  border-radius: 0 4px 4px 0;
+}
+.notice a { display: block; font-weight: 600; margin-top: 4px; }
+.stage {
+  position: sticky;
+  top: 18px;
+  min-width: 0;
+  background: #e1e0d8;
+  border: 1px solid #cecec4;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.stage-toolbar {
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid #cecec4;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  font-weight: 700;
+  color: #4b5243;
+}
+.view-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #7b7e74;
+}
+.view-controls button {
+  font-size: 10px;
+  background: #eae8df;
+  border: 1px solid #cecec4;
+  border-radius: 4px;
+  padding: 4px 9px;
+  color: #48523c;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+.view-controls button:hover { background: #dedccf; }
+.poster-wrap {
+  padding: 32px 40px 18px;
+  display: flex;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #eeede7 0%, #deded5 100%);
+  transition: padding 0.2s ease;
+}
+#poster {
+  width: min(100%, 530px);
+  filter: drop-shadow(0 14px 28px rgba(0,0,0,0.18));
+  line-height: 0;
+  transition: width 0.25s ease, max-width 0.25s ease;
+}
+#poster svg { width: 100%; height: auto; display: block; }
+body.poster-zoomed #poster {
+  width: min(100%, 860px);
+}
+body.poster-zoomed .poster-wrap {
+  padding: 16px 12px;
+}
+.stage-caption {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 28px 22px;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  color: #7d8273;
+  font-weight: 700;
+}
+.export-panel {
+  background: #faf8f2;
+  border-top: 1px solid #cecec4;
+  padding: 22px 24px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+.export-panel h2 { font-family: Georgia, serif; font-size: 22px; font-weight: 400; }
+.export-panel p { font-size: 10px; color: var(--muted); margin: 4px 0 0; }
+.export-controls { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
+.dpi-label { font-size: 8px; letter-spacing: .3px; font-weight: 700; }
+.dpi-label select { padding: 7px; margin-top: 2px; font-size: 11px; }
+.export-panel .status { width: 100%; margin: 0; }
+.art-actions-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.auto-btn { background: #bce376; border-color: #a3cc59; color: #1e2815; font-weight: 700; }
+.auto-btn:hover { background: #abda5c; }
+.art-search-box {
+  background: #eae8dd;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+.art-search-box input { margin-top: 0; }
+.artwork-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.artwork-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+.artwork-card:hover {
+  border-color: #708a46;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.artwork-card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+  background: #eee;
+}
+.artwork-card-info {
+  padding: 6px 8px;
+  font-size: 10px;
+  line-height: 1.35;
+}
+.artwork-card-info strong {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 11px;
+}
+.artwork-card-info span {
+  display: block;
+  color: var(--muted);
+  font-size: 9px;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.artwork-card-badge {
+  display: inline-block;
+  font-size: 8px;
+  font-weight: 700;
+  background: #e2f2cc;
+  color: #2e5917;
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-top: 4px;
+}
+footer {
+  padding: 40px 0 30px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 40px;
+}
+footer > span { font-size: 9px; letter-spacing: 1.5px; white-space: nowrap; font-weight: 700; color: #585e50; }
+footer p { font-size: 10px; color: var(--muted); max-width: 600px; margin: 0; line-height: 1.7; }
+
+@media (min-width: 1400px) {
+  .workspace { grid-template-columns: 375px minmax(0, 1fr); }
+  #poster { width: min(100%, 610px); }
+}
+@media (max-width: 1050px) {
+  .workspace { grid-template-columns: 320px minmax(0, 1fr); gap: 16px; }
+  main { padding: 0 3%; }
+  .control-section { padding: 18px; }
+  .poster-wrap { padding: 24px 20px 12px; }
+  .export-panel { padding: 18px; }
+  .stage-toolbar { padding: 0 16px; }
+  .header-note { display: none; }
+}
+@media (max-width: 760px) {
+  .masthead { height: 68px; padding: 0 18px; }
+  .privacy { font-size: 9px; }
+  .intro { padding: 28px 4px 22px; }
+  .intro-note { display: none; }
+  h1 { font-size: 36px; }
+  .workspace { display: flex; flex-direction: column; }
+  .stage { position: static; width: 100%; order: -1; }
+  .controls { width: 100%; }
+  main { padding: 0 14px; }
+  .poster-wrap { padding: 20px 14px 12px; }
+  #poster { max-width: 400px; }
+  .stage-caption { font-size: 7px; padding: 8px 16px 16px; }
+  .export-controls { width: 100%; gap: 6px; }
+  .export-controls button { flex: 1; padding: 9px 6px; }
+  .stage-toolbar { height: 44px; }
+  .view-controls { gap: 8px; }
+  .control-section { padding: 20px 16px; }
+  footer { flex-direction: column; gap: 12px; padding: 25px 6px; }
+  .intro p { font-size: 12px; }
+}
+@media print {
+  body { background: white; }
+  .masthead, .controls, .intro, .stage-toolbar, .stage-caption, .export-panel, footer { display: none!important; }
+  main { padding: 0; max-width: none; }
+  .workspace, .stage, .poster-wrap { display: block; margin: 0; padding: 0; border: 0; background: none; }
+  .stage { position: static; }
+  #poster { filter: none; width: 100%; max-width: none; }
+}
+</style><script type="module">/** Print renderer: embedded raster artwork + resolution-independent typography. */
+const SIZES = {
+  '12x12': [12, 12],
+  '12x18': [12, 18],
+  '18x24': [18, 24],
+  '24x36': [24, 36],
+  'A3': [11.7, 16.5],
+  'A4': [8.3, 11.7]
+};
+const clamp = (n, min, max, fallback) => Number.isFinite(Number(n)) ? Math.min(max, Math.max(min, Number(n))) : fallback;
+const color = (value, fallback) => /^#[0-9a-f]{6}$/i.test(value || '') ? value : fallback;
+function escapeXML(value = '') { return String(value).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&apos;' }[c])); }
+function dataImage(value, allowSVG = false) {
+  if (!value) return '';
+  // Restrict embedded images to inert raster data, never remote URLs or SVG payloads.
+  if (!(allowSVG ? /^data:image\/(?:png|jpeg|webp|svg\+xml);base64,[a-z0-9+/=\s]+$/i : /^data:image\/(?:png|jpeg|webp);base64,[a-z0-9+/=\s]+$/i).test(value)) throw new Error('Use an embedded PNG, JPEG, or WebP image. Remote URLs and SVG images are not allowed.');
+  return value.replace(/\s/g, '');
+}
+function plain(value, max = 400) { return String(value ?? '').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').slice(0, max); }
+function width(text, size, bold = false) {
+  return Array.from(text).reduce((sum, c) => sum + (/\s/.test(c) ? .28 : /[ilI.,:;'!|]/.test(c) ? .25 : /[MW@#%]/.test(c) ? .91 : /[^\u0000-\u024f]/.test(c) ? 1 : /[A-Z]/.test(c) ? .67 : .53), 0) * size * (bold ? 1.04 : 1);
+}
+function fit(text, max, preferred, bold = false) { return Math.min(preferred, preferred * max / Math.max(1, width(text, preferred, bold))); }
+function wrap(text, max, size, bold = false) {
+  const str = String(text ?? '').trim();
+  if (!str) return [''];
+  const words = str.split(/\s+/);
+  const output = [];
+  let line = '';
+  for (const word of words) {
+    const testLine = line ? `${line} ${word}` : word;
+    if (width(testLine, size, bold) <= max) {
+      line = testLine;
+    } else {
+      if (line) {
+        output.push(line);
+        line = '';
+      }
+      if (width(word, size, bold) > max) {
+        let chunk = '';
+        for (const char of Array.from(word)) {
+          if (chunk && width(chunk + char, size, bold) > max) {
+            output.push(chunk);
+            chunk = '';
+          }
+          chunk += char;
+        }
+        line = chunk;
+      } else {
+        line = word;
+      }
+    }
+  }
+  if (line) output.push(line);
+  return output.length ? output : [''];
+}
+function layout(state) {
+  const inches = SIZES[state.size] || SIZES['18x24'];
+  const h = 1080 * inches[1] / inches[0];
+  const tracks = (Array.isArray(state.tracks) ? state.tracks : []).map(t => plain(t));
+  if (tracks.length > 60) throw new Error('This poster supports up to 60 tracks. Remove extra tracks before exporting.');
+  
+  const gap = 30, left = 54, metadataX = 808;
+  const colCount = state.columns === '1' ? 1 : state.columns === '3' ? 3 : 2;
+  const availableTrackWidth = metadataX - left - gap;
+  const colWidth = colCount === 1 ? availableTrackWidth : colCount === 3 ? Math.floor((availableTrackWidth - gap * 2) / 3) : 330;
+
+  // Adaptive font sizing: if track titles are long or many, scale trackSize down so artSize stays >= 300
+  let trackSize = tracks.length > 40 ? 13 : tracks.length > 24 ? 15 : 18;
+  if (colCount === 3 && trackSize > 13) trackSize = 13;
+  if (colCount === 1 && tracks.length <= 8) trackSize = 20;
+
+  let columns, lines, rowHeight, metadataHeight, needed, artSize, middle;
+
+  const getColumns = () => {
+    if (colCount === 1) {
+      return [tracks];
+    } else if (colCount === 3) {
+      const perCol = Math.ceil(tracks.length / 3);
+      return [tracks.slice(0, perCol), tracks.slice(perCol, perCol * 2), tracks.slice(perCol * 2)];
+    } else {
+      middle = Math.ceil(tracks.length / 2);
+      return [tracks.slice(0, middle), tracks.slice(middle)];
+    }
+  };
+
+  while (trackSize >= 8.5) {
+    columns = getColumns();
+    lines = columns.map(column => column.map(t => wrap(t, colWidth - 33, trackSize)));
+    rowHeight = trackSize * 1.37;
+    const trackPad = trackSize < 12 ? 3 : 6;
+    metadataHeight = [state.date, state.duration, state.label, String(tracks.length)].filter(Boolean).reduce((sum, value) => sum + 39 + 19 * wrap(plain(value, 140), 218, 14).length, 0) + (state.codeDataUrl ? 218 * clamp(state.codeHeight, 1, 10000, 160) / clamp(state.codeWidth, 1, 10000, 640) : 0);
+    needed = Math.max(140, metadataHeight, ...lines.map(column => column.reduce((total, rows) => total + rows.length * rowHeight + trackPad, 0)));
+    artSize = Math.min(972, h - 54 - 196 - needed - 65);
+    if (artSize >= 300 || trackSize <= 8.5) break;
+    trackSize -= 0.5;
+  }
+
+  if (artSize < 300) throw new Error('These track names are too long for this print layout. Shorten track labels or choose a taller format.');
+  return { inches, h, tracks, middle: middle || Math.ceil(tracks.length / 2), columns, colCount, lines, trackSize, rowHeight, needed, artSize, left, colWidth, gap, metadataX };
+}
+function effectivePpi(state = {}) {
+  const l = layout(state);
+  const aw = Number(state.artWidth) || 0, ah = Number(state.artHeight) || 0;
+  if (!aw || !ah) return 0;
+  const printedSquare = (l.artSize - 2 * clamp(state.borderWidth, 0, 32, 8)) / 1080 * l.inches[0];
+  return Math.round(Math.max(aw, ah) / printedSquare);
+}
+function createPosterSVG(state = {}) {
+  const l = layout(state), { h, artSize, left, tracks, trackSize, rowHeight, colWidth, metadataX } = l;
+  const dark = state.theme !== 'light';
+  const bg = color(state.background, dark ? '#151515' : '#F3F0E9');
+  const bg2 = color(state.background2, dark ? '#080808' : '#DDD6C6');
+  const ink = color(state.textColor, dark ? '#F7F2E8' : '#171717');
+  const border = color(state.borderColor, dark ? '#F7F2E8' : '#171717');
+  const bw = clamp(state.borderWidth, 0, 32, 8);
+  const palette = (Array.isArray(state.palette) && state.palette.length ? state.palette : ['#30251F','#735845','#A77953','#C6A989','#DDD2BE']).slice(0,5).map(c => color(c,'#777777'));
+  const art = dataImage(state.artDataUrl), code = dataImage(state.codeDataUrl, true);
+  const fontChoice = state.fontFamily === 'serif' ? 'Georgia, "Times New Roman", Garamond, serif' : state.fontFamily === 'mono' ? '"SF Mono", Menlo, Consolas, Monaco, monospace' : 'Arial, Helvetica, sans-serif';
+  const artFit = state.artFit === 'slice' ? 'xMidYMid slice' : 'xMidYMid meet';
+
+  let bgFill = bg;
+  let defsMarkup = '';
+  const gradMode = state.bgGradient || 'none';
+  if (gradMode === 'linear-v') {
+    defsMarkup = `<defs><linearGradient id="posterBg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${bg}"/><stop offset="100%" stop-color="${bg2}"/></linearGradient></defs>`;
+    bgFill = 'url(#posterBg)';
+  } else if (gradMode === 'linear-d') {
+    defsMarkup = `<defs><linearGradient id="posterBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${bg}"/><stop offset="100%" stop-color="${bg2}"/></linearGradient></defs>`;
+    bgFill = 'url(#posterBg)';
+  } else if (gradMode === 'radial') {
+    defsMarkup = `<defs><radialGradient id="posterBg" cx="50%" cy="32%" r="65%" fx="50%" fy="32%"><stop offset="0%" stop-color="${bg2}"/><stop offset="100%" stop-color="${bg}"/></radialGradient></defs>`;
+    bgFill = 'url(#posterBg)';
+  } else if (gradMode === 'palette') {
+    defsMarkup = `<defs><linearGradient id="posterBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${palette[0]}"/><stop offset="35%" stop-color="${palette[1]}"/><stop offset="70%" stop-color="${palette[2]}"/><stop offset="100%" stop-color="${palette[3] || palette[4]}"/></linearGradient></defs>`;
+    bgFill = 'url(#posterBg)';
+  } else if (gradMode === 'duotone') {
+    defsMarkup = `<defs><linearGradient id="posterBg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${palette[0]}"/><stop offset="100%" stop-color="${palette[4]}"/></linearGradient></defs>`;
+    bgFill = 'url(#posterBg)';
+  }
+  
+  const parts = [
+    `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${l.inches[0]}in" height="${l.inches[1]}in" viewBox="0 0 1080 ${h}" role="img" aria-label="${escapeXML(plain(state.title || 'Album poster'))}">`,
+    defsMarkup,
+    `<title>${escapeXML(plain(state.title || 'Album poster'))} — ${escapeXML(plain(state.artist))}</title>`,
+    `<rect width="1080" height="${h}" fill="${bgFill}"/>`
+  ].filter(Boolean);
+  const text = (str, x, y, size, options = {}) => parts.push(`<text x="${x}" y="${y}" fill="${ink}" font-family="${fontChoice}" font-size="${size.toFixed(3)}"${options.bold ? ' font-weight="700"' : ''}${options.opacity ? ` opacity="${options.opacity}"` : ''}${options.spacing ? ` letter-spacing="${options.spacing}"` : ''}>${escapeXML(str)}</text>`);
+  const ax = (1080-artSize)/2, ay = 54;
+  parts.push(`<rect x="${ax}" y="${ay}" width="${artSize}" height="${artSize}" fill="${border}"/>`);
+  if (art) parts.push(`<image x="${ax+bw}" y="${ay+bw}" width="${artSize-2*bw}" height="${artSize-2*bw}" preserveAspectRatio="${artFit}" xlink:href="${art}"/>`);
+  else { text('YOUR ALBUM ART', ax+artSize*.13, ay+artSize*.52, fit('YOUR ALBUM ART',artSize*.74,40), {bold:true}); }
+  const title = plain(state.title || 'UNTITLED', 160);
+  const titleY = ay + artSize + 64;
+  const titleSize = fit(title, 972, 57, true);
+  text(title, left, titleY, titleSize, {bold:true});
+  const artist = plain(state.artist || 'ARTIST NAME', 160);
+  text(artist, left, titleY+37, fit(artist,710,23), {opacity:.82});
+  const swatchW = 34, swatchGap = 7;
+  const rx = state.swatchStyle === 'pill' ? 11 : 3;
+  palette.forEach((c,i) => parts.push(`<rect x="${1026-palette.length*(swatchW+swatchGap)+swatchGap+i*(swatchW+swatchGap)}" y="${titleY+16}" width="${swatchW}" height="22" rx="${rx}" ry="${rx}" fill="${c}"/>`));
+  const ruleY = titleY+64;
+  parts.push(`<path d="M54 ${ruleY}H1026" stroke="${ink}" stroke-width="2"/>`);
+  const contentY = ruleY+35;
+  const trackPad = trackSize < 12 ? 3 : 6;
+  l.lines.forEach((column,index) => {
+    let y = contentY;
+    const colOffset = index === 0 ? 0 : l.colCount === 3 ? index * Math.ceil(tracks.length / 3) : l.middle;
+    column.forEach((rows,j) => {
+      text(String(colOffset+j+1).padStart(2,'0'),left+index*(colWidth+l.gap),y,trackSize*.75,{opacity:.55});
+      rows.forEach(row => { text(row,left+index*(colWidth+l.gap)+33,y,trackSize); y+=rowHeight; });
+      y+=trackPad;
+    });
+  });
+  let my = contentY;
+  const metadata = (heading,value) => {
+    if (!value) return;
+    text(heading,metadataX,my,10,{spacing:1.5,opacity:.55}); my+=21;
+    wrap(plain(value,140),218,14).forEach(line => { text(line,metadataX,my,14); my+=19; }); my+=18;
+  };
+  metadata('RELEASED',state.date);
+  metadata('RUNTIME',state.duration);
+  metadata('LABEL',state.label);
+  metadata('TRACKS',String(tracks.length));
+  if(code) {
+    const cw = clamp(state.codeWidth,1,10000,640), ch = clamp(state.codeHeight,1,10000,160);
+    const codeW = 218, codeH = codeW*ch/cw;
+    if (my+codeH > h-48) throw new Error('Spotify code is too tall for this poster. Use the full horizontal Spotify Code image.');
+    parts.push(`<image x="${metadataX}" y="${my}" width="${codeW}" height="${codeH}" preserveAspectRatio="xMidYMid meet" xlink:href="${code}"/>`);
+  }
+  parts.push('</svg>'); return parts.join('\n');
+}
+/** Small deterministic median-cut-style palette; all pixels are sampled locally. */
+function extractPalette(image) {
+  const canvas = typeof document !== 'undefined' ? document.createElement('canvas') : null;
+  if (!canvas) throw new Error('Palette extraction requires a browser canvas.');
+  canvas.width = 96; canvas.height = 96;
+  const ctx = canvas.getContext('2d', {willReadFrequently:true});
+  ctx.drawImage(image,0,0,96,96);
+  const pixels = ctx.getImageData(0,0,96,96).data;
+  const bins = new Map();
+  for (let i=0;i<pixels.length;i+=4) {
+    if(pixels[i+3]<128) continue;
+    const rgb=[pixels[i],pixels[i+1],pixels[i+2]], key=rgb.map(v=>v>>5).join(',');
+    const b=bins.get(key)||{n:0,r:0,g:0,b:0}; b.n++; b.r+=rgb[0];b.g+=rgb[1];b.b+=rgb[2]; bins.set(key,b);
+  }
+  const ranked=[...bins.values()].sort((a,b)=>b.n-a.n).map(b=>[b.r/b.n,b.g/b.n,b.b/b.n]);
+  const chosen=[];
+  for(const rgb of ranked) { if(chosen.every(c=>c.reduce((sum,v,i)=>sum+(v-rgb[i])**2,0)>2600)) chosen.push(rgb); if(chosen.length===5) break; }
+  for(const rgb of ranked) { if(chosen.length===5) break; if(!chosen.includes(rgb))chosen.push(rgb); }
+  if (!chosen.length) chosen.push([127,127,127]);
+  while(chosen.length<5) chosen.push(chosen[chosen.length-1]);
+  return chosen.sort((a,b)=>a.reduce((s,v)=>s+v,0)-b.reduce((s,v)=>s+v,0)).map(rgb=>'#'+rgb.map(v=>Math.round(v).toString(16).padStart(2,'0')).join(''));
+}
+
+function spotifyUri(value){const input=value.trim();let id;if(/^spotify:album:[A-Za-z0-9]{22}$/.test(input))return input;try{const u=new URL(input);if(u.protocol==='https:'&&u.hostname==='open.spotify.com'){const m=u.pathname.match(/^\/(?:intl-[a-z]{2}\/)?album\/([A-Za-z0-9]{22})\/?$/);if(m)id=m[1];}}catch{}if(!id)throw new Error('Paste a full Spotify album link or spotify:album: URI. Short links are not supported.');return 'spotify:album:'+id;}
+function crc32(bytes){let crc=0xffffffff;for(const b of bytes){crc^=b;for(let k=0;k<8;k++)crc=(crc>>>1)^((crc&1)?0xedb88320:0);}return (crc^0xffffffff)>>>0;}
+async function pngWithDpi(blob,dpi){const bytes=new Uint8Array(await blob.arrayBuffer());const data=new Uint8Array(9),dv=new DataView(data.buffer);dv.setUint32(0,Math.round(dpi/.0254));dv.setUint32(4,Math.round(dpi/.0254));data[8]=1;const type=new TextEncoder().encode('pHYs');const chunk=new Uint8Array(21);new DataView(chunk.buffer).setUint32(0,9);chunk.set(type,4);chunk.set(data,8);new DataView(chunk.buffer).setUint32(17,crc32(chunk.subarray(4,17)));const parts=[bytes.subarray(0,33),chunk];for(let off=33;off<bytes.length;){const len=new DataView(bytes.buffer,bytes.byteOffset+off,4).getUint32(0);const name=String.fromCharCode(...bytes.subarray(off+4,off+8));if(name!=='pHYs')parts.push(bytes.subarray(off,off+len+12));off+=len+12;}return new Blob(parts,{type:'image/png'});}
+
+
+const $=id=>document.getElementById(id);
+let state, artImage, svg='', requestId=0;
+const status=(id,message,error=false)=>{ $(id).textContent=message;$(id).className='status '+(error?'error':'success'); };
+const loadImage=src=>new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('This image could not be decoded. Try PNG or JPEG.'));image.src=src;});
+const readFile=file=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Could not read this file.'));reader.readAsDataURL(file);});
+const utf8Base64=text=>{const bytes=new TextEncoder().encode(text);let binary='';for(let i=0;i<bytes.length;i+=16384)binary+=String.fromCharCode(...bytes.subarray(i,i+16384));return btoa(binary);};
+
+function demoArtSlowOrbit(){
+  const c=document.createElement('canvas');c.width=c.height=1800;const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,1800,1800);g.addColorStop(0,'#182f37');g.addColorStop(.48,'#54766c');g.addColorStop(1,'#e3c789');
+  x.fillStyle=g;x.fillRect(0,0,1800,1800);x.save();x.translate(900,900);x.rotate(-.28);
+  for(let i=0;i<8;i++){x.strokeStyle=['#eac67e','#90a189','#dd774b','#243c41'][i%4];x.lineWidth=82;x.beginPath();x.ellipse(0,0,740-i*79,810-i*79,0,0,Math.PI*2);x.stroke();}
+  x.restore();const shade=x.createLinearGradient(0,900,0,1800);shade.addColorStop(0,'#122a3000');shade.addColorStop(1,'#122a30bb');
+  x.fillStyle=shade;x.fillRect(0,0,1800,1800);return c.toDataURL('image/png');
+}
+
+function demoArtDarkSide(){
+  const c=document.createElement('canvas');c.width=c.height=1800;const x=c.getContext('2d');
+  const bg=x.createRadialGradient(900,900,100,900,900,1100);bg.addColorStop(0,'#0d0f14');bg.addColorStop(1,'#040507');
+  x.fillStyle=bg;x.fillRect(0,0,1800,1800);
+  x.strokeStyle='#ffffff44';x.lineWidth=8;x.beginPath();x.moveTo(0,980);x.lineTo(820,900);x.stroke();
+  const colors=['#e63946','#f3722c','#f8961e','#90be6d','#43aa8b','#577590'];
+  colors.forEach((col,i)=>{
+    x.strokeStyle=col;x.lineWidth=14;x.beginPath();x.moveTo(980,900);x.lineTo(1800,750+i*55);x.stroke();
+  });
+  x.strokeStyle='#ffffff';x.lineWidth=24;x.beginPath();
+  x.moveTo(900,600);x.lineTo(720,1020);x.lineTo(1080,1020);x.closePath();x.stroke();
+  return c.toDataURL('image/png');
+}
+
+function demoArtKindofBlue(){
+  const c=document.createElement('canvas');c.width=c.height=1800;const x=c.getContext('2d');
+  const bg=x.createLinearGradient(0,0,1800,1800);bg.addColorStop(0,'#070b12');bg.addColorStop(.5,'#122239');bg.addColorStop(1,'#1f3d5c');
+  x.fillStyle=bg;x.fillRect(0,0,1800,1800);
+  for(let i=0;i<5;i++){
+    const rad=x.createRadialGradient(900,900,50+i*90,900,900,300+i*180);
+    rad.addColorStop(0,`rgba(201,138,62,${0.3-i*0.05})`);rad.addColorStop(1,'rgba(18,34,57,0)');
+    x.fillStyle=rad;x.beginPath();x.arc(900,900,300+i*180,0,Math.PI*2);x.fill();
+  }
+  x.strokeStyle='#e8c882';x.lineWidth=18;x.beginPath();
+  x.arc(900,900,260,0.5,Math.PI*1.8);x.stroke();
+  return c.toDataURL('image/png');
+}
+
+function demoArtDiscovery(){
+  const c=document.createElement('canvas');c.width=c.height=1800;const x=c.getContext('2d');
+  const bg=x.createLinearGradient(0,0,0,1800);bg.addColorStop(0,'#090414');bg.addColorStop(.6,'#240d42');bg.addColorStop(1,'#4a156e');
+  x.fillStyle=bg;x.fillRect(0,0,1800,1800);
+  x.strokeStyle='#00e5ff33';x.lineWidth=4;
+  for(let y=1100;y<1800;y+=50){x.beginPath();x.moveTo(0,y);x.lineTo(1800,y);x.stroke();}
+  for(let xpos=0;xpos<=1800;xpos+=120){x.beginPath();x.moveTo(900,1050);x.lineTo(xpos,1800);x.stroke();}
+  const orb=x.createRadialGradient(900,750,20,900,750,320);orb.addColorStop(0,'#ffffff');orb.addColorStop(.2,'#00e5ff');orb.addColorStop(.6,'#ff007f');orb.addColorStop(1,'#180533');
+  x.fillStyle=orb;x.beginPath();x.arc(900,750,320,0,Math.PI*2);x.fill();
+  return c.toDataURL('image/png');
+}
+
+function demoArtRumours(){
+  const c=document.createElement('canvas');c.width=c.height=1800;const x=c.getContext('2d');
+  x.fillStyle='#f0e8dc';x.fillRect(0,0,1800,1800);
+  const colors=['#ab4a26','#6b543e','#d9a036','#3d4734'];
+  for(let i=0;i<4;i++){
+    x.strokeStyle=colors[i];x.lineWidth=54;x.beginPath();
+    x.ellipse(900,1200-i*130,520-i*80,480-i*70,0,Math.PI,0);x.stroke();
+  }
+  return c.toDataURL('image/png');
+}
+
+function demoArtOKComputer(){
+  const c=document.createElement('canvas');c.width=c.height=1800;const x=c.getContext('2d');
+  x.fillStyle='#e4e9ee';x.fillRect(0,0,1800,1800);
+  x.strokeStyle='#778da944';x.lineWidth=3;
+  for(let p=100;p<1800;p+=80){
+    x.beginPath();x.moveTo(p,0);x.lineTo(p,1800);x.stroke();
+    x.beginPath();x.moveTo(0,p);x.lineTo(1800,p);x.stroke();
+  }
+  x.strokeStyle='#1b263b';x.lineWidth=12;
+  x.strokeRect(300,300,1200,1200);
+  x.beginPath();x.moveTo(300,300);x.lineTo(1500,1500);x.moveTo(1500,300);x.lineTo(300,1500);x.stroke();
+  return c.toDataURL('image/png');
+}
+
+const PRESETS = {
+  slowOrbit: {
+    name: 'Slow Orbit (Demo)',
+    title: 'SLOW ORBIT',
+    artist: 'The Sunday Archive',
+    date: 'October 10, 2026',
+    duration: '42:18',
+    label: 'Independent / Original Demo',
+    tracks: ['First Light','Warm Receiver','Lost in the Signal','Somewhere, Slowly','Golden Hour','Side Streets','The Long Way Home','After the Rain','Soft Landing','Still Here'],
+    palette: ['#1a343b','#55756b','#8f9e86','#dd784b','#eac67e'],
+    background: '#14262b',
+    textColor: '#f6f0dd',
+    borderColor: '#e4cd98',
+    borderWidth: 8,
+    theme: 'dark',
+    fontFamily: 'sans',
+    columns: 'auto',
+    size: '18x24',
+    generator: demoArtSlowOrbit
+  },
+  darkSide: {
+    name: 'The Dark Side of the Moon',
+    title: 'THE DARK SIDE OF THE MOON',
+    artist: 'Pink Floyd',
+    date: 'March 1, 1973',
+    duration: '42:50',
+    label: 'Harvest / Capitol Records',
+    tracks: ['Speak to Me','Breathe (In the Air)','On the Run','Time','The Great Gig in the Sky','Money','Us and Them','Any Colour You Like','Brain Damage','Eclipse'],
+    palette: ['#0d0e12','#212529','#e63946','#f1faee','#457b9d'],
+    background: '#090a0d',
+    textColor: '#f5f5f7',
+    borderColor: '#ffffff',
+    borderWidth: 6,
+    theme: 'dark',
+    fontFamily: 'sans',
+    columns: 'auto',
+    size: '18x24',
+    spotifyUrl: 'https://open.spotify.com/album/4LH4d3cOWNNsVw41Gqt2kv',
+    generator: demoArtDarkSide
+  },
+  kindOfBlue: {
+    name: 'Kind of Blue',
+    title: 'KIND OF BLUE',
+    artist: 'Miles Davis',
+    date: 'August 17, 1959',
+    duration: '45:37',
+    label: 'Columbia Records',
+    tracks: ['So What','Freddie Freeloader','Blue in Green','All Blues','Flamenco Sketches'],
+    palette: ['#0c1524','#1a2e47','#365578','#c98a3e','#e8c882'],
+    background: '#0a101b',
+    textColor: '#efe7d8',
+    borderColor: '#c98a3e',
+    borderWidth: 10,
+    theme: 'dark',
+    fontFamily: 'serif',
+    columns: '1',
+    size: '18x24',
+    spotifyUrl: 'https://open.spotify.com/album/1weenldGvE43s0P5Y0T8fM',
+    generator: demoArtKindofBlue
+  },
+  discovery: {
+    name: 'Discovery',
+    title: 'DISCOVERY',
+    artist: 'Daft Punk',
+    date: 'March 12, 2001',
+    duration: '60:50',
+    label: 'Virgin Records',
+    tracks: ['One More Time','Aerodynamic','Digital Love','Harder, Better, Faster, Stronger','Crescendolls','Nightvision','Superheroes','High Life','Something About Us','Voyager','Veridis Quo','Short Circuit','Face to Face','Too Long'],
+    palette: ['#120924','#38166d','#ff007f','#00e5ff','#ffbe0b'],
+    background: '#0d071a',
+    textColor: '#fdfbfe',
+    borderColor: '#00e5ff',
+    borderWidth: 8,
+    theme: 'dark',
+    fontFamily: 'sans',
+    columns: '2',
+    size: '18x24',
+    spotifyUrl: 'https://open.spotify.com/album/2noRn2Aes5aoNVsU6iWThc',
+    generator: demoArtDiscovery
+  },
+  rumours: {
+    name: 'Rumours',
+    title: 'RUMOURS',
+    artist: 'Fleetwood Mac',
+    date: 'February 4, 1977',
+    duration: '39:43',
+    label: 'Warner Bros. Records',
+    tracks: ['Second Hand News','Dreams','Never Going Back Again',"Don't Stop",'Go Your Own Way','Songbird','The Chain','You Make Loving Fun',"I Don't Want to Know",'Oh Daddy','Gold Dust Woman'],
+    palette: ['#28221b','#6b543e','#ab4a26','#d9a036','#f3ebe1'],
+    background: '#f4ede2',
+    textColor: '#241e17',
+    borderColor: '#3a2d21',
+    borderWidth: 8,
+    theme: 'light',
+    fontFamily: 'serif',
+    columns: '2',
+    size: '18x24',
+    spotifyUrl: 'https://open.spotify.com/album/1TEowX5k7nvSR1VzSotWM0',
+    generator: demoArtRumours
+  },
+  okComputer: {
+    name: 'OK Computer',
+    title: 'OK COMPUTER',
+    artist: 'Radiohead',
+    date: 'May 21, 1997',
+    duration: '53:21',
+    label: 'Parlophone / Capitol',
+    tracks: ['Airbag','Paranoid Android','Subterranean Homesick Alien','Exit Music (For a Film)','Let Down','Karma Police','Fitter Happier','Electioneering','Climbing Up the Walls','No Surprises','Lucky','The Tourist'],
+    palette: ['#1c2630','#415a77','#778da9','#e0e1dd','#ffffff'],
+    background: '#e8ecf0',
+    textColor: '#151d24',
+    borderColor: '#151d24',
+    borderWidth: 6,
+    theme: 'light',
+    fontFamily: 'mono',
+    columns: '2',
+    size: '18x24',
+    spotifyUrl: 'https://open.spotify.com/album/6dVIqQ8qmQ5GBnJ9shOYGE',
+    generator: demoArtOKComputer
+  }
+};
+
+const THEMES = {
+  custom: null,
+  warmVinyl: { bg: '#161311', text: '#f5efe6', border: '#d19853', palette: ['#161311','#382317','#8c4e28','#d19853','#f5efe6'] },
+  tokyoNeon: { bg: '#0b0d14', text: '#f7f9fc', border: '#00e5ff', palette: ['#0b0d14','#26de81','#00e5ff','#ff2d75','#f7f9fc'] },
+  galleryCream: { bg: '#f5f2eb', text: '#1a1a1a', border: '#1a1a1a', palette: ['#1a1a1a','#524b3f','#948b7b','#d9d2c5','#f5f2eb'] },
+  obsidianGold: { bg: '#0d0e12', text: '#f3eccb', border: '#d4af37', palette: ['#0d0e12','#252730','#7a6627','#d4af37','#f3eccb'] },
+  nordicMist: { bg: '#1a2027', text: '#e8edf2', border: '#7f94a8', palette: ['#1a2027','#4b5d6e','#7f94a8','#9cb3c9','#e8edf2'] },
+  terracotta: { bg: '#1b1310', text: '#f7ede2', border: '#cb6843', palette: ['#1b1310','#84432a','#cb6843','#e29578','#f7ede2'] }
+};
+
+function formatDuration(ms) {
+  if (ms == null) return '';
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+
+function syncFields(){
+  for(const id of ['title','artist','date','duration','label','size','theme','background','background2','bgGradient','textColor','borderColor','borderWidth','spotifyUrl','fontFamily','columns','artFit']){
+    if ($(id)) $(id).value = state[id] ?? '';
+  }
+  $('tracks').value = state.tracks.join('\n');
+  paintPalette();
+  updateBg2Visibility();
+}
+
+function updateBg2Visibility(){
+  const bg2Group = $('bg2Group');
+  if (bg2Group) {
+    const show = ['linear-v','linear-d','radial'].includes(state.bgGradient);
+    bg2Group.hidden = !show;
+  }
+}
+
+function paintPalette(){
+  $('palette').replaceChildren(...state.palette.map((color,i)=>{
+    const input=document.createElement('input');
+    input.type='color';input.value=color;
+    input.setAttribute('aria-label',`Palette color ${i+1}`);
+    input.addEventListener('input',()=>{ state.palette[i]=input.value; render(); });
+    return input;
+  }));
+}
+
+function render(){
+  try{
+    svg=createPosterSVG(state);
+    $('poster').innerHTML=svg;
+    const ppi=effectivePpi(state);
+    const ppiEl=$('ppi');
+    ppiEl.textContent=ppi?`${ppi} PPI`:'—';
+    if(ppi>=300){
+      ppiEl.className='ppi-badge ppi-excellent';
+      $('qualityHint').textContent='✓ Artwork meets 300+ PPI gallery print standard at this size.';
+    } else if(ppi>=150){
+      ppiEl.className='ppi-badge ppi-good';
+      $('qualityHint').textContent=`Artwork provides ${ppi} PPI at this size (suitable for wall viewing). Aim for 300 PPI for ultra-fine detail.`;
+    } else if(ppi>0){
+      ppiEl.className='ppi-badge ppi-low';
+      $('qualityHint').textContent=`Artwork provides ${ppi} PPI at this size. Consider higher-resolution artwork or smaller print size.`;
+    } else {
+      ppiEl.className='ppi-badge';
+      $('qualityHint').textContent='';
+    }
+    $('borderValue').textContent=`${state.borderWidth} units`;
+    $('sizeBadge').textContent=state.size.replace('x',' × ')+' IN';
+    const [w,h]=(state.size==='A3'?[11.7,16.5]:state.size.split('x').map(Number));
+    $('exportDescription').textContent=`SVG · ${Math.round(w*Number($('dpi').value))} × ${Math.round(h*Number($('dpi').value))} PNG · Print / PDF`;
+    return true;
+  }catch(e){
+    status('exportStatus',e.message,true);
+    return false;
+  }
+}
+
+async function loadPreset(key){
+  const p = PRESETS[key] || PRESETS.slowOrbit;
+  requestId++;
+  $('searchButton').disabled = false;
+  state = {
+    title: p.title,
+    artist: p.artist,
+    date: p.date,
+    duration: p.duration,
+    label: p.label,
+    tracks: [...p.tracks],
+    artDataUrl: p.generator(),
+    artWidth: 1800,
+    artHeight: 1800,
+    codeDataUrl: '',
+    codeWidth: 640,
+    codeHeight: 160,
+    spotifyUrl: p.spotifyUrl || '',
+    bgGradient: p.bgGradient || 'none',
+    background2: p.background2 || (p.palette ? p.palette[1] : '#080808'),
+    size: p.size || '18x24',
+    palette: [...p.palette],
+    background: p.background,
+    textColor: p.textColor,
+    borderColor: p.borderColor,
+    borderWidth: p.borderWidth,
+    theme: p.theme,
+    fontFamily: p.fontFamily || 'sans',
+    columns: p.columns || 'auto',
+    artFit: 'meet'
+  };
+  artImage = await loadImage(state.artDataUrl);
+  $('rights').checked = true;
+  $('licenseNote').value = `Original procedural demo artwork created for ${p.name}.`;
+  $('codeConfirmed').checked = false;
+  $('removeCode').hidden = true;
+  $('metadataSource').hidden = true;
+  $('searchResults').replaceChildren();
+  for (const id of ['searchStatus','codeStatus','artStatus','exportStatus']) status(id,'');
+  $('previewCaption').textContent = `${p.name.toUpperCase()} · DEMO ART · NO COPYRIGHTED ART INCLUDED`;
+  document.querySelectorAll('.preset-chip').forEach(btn => btn.classList.toggle('active', btn.dataset.preset === key));
+  syncFields();
+  render();
+  if (p.spotifyUrl) {
+    autoPullSpotifyCode(p.spotifyUrl).catch(() => {});
+  }
+}
+
+async function reset(){
+  await loadPreset('slowOrbit');
+}
+
+for(const id of ['title','artist','date','duration','label','size','background','background2','textColor','borderColor','borderWidth','fontFamily','columns','artFit']){
+  const el=$(id);
+  if (el) {
+    el.addEventListener('input',()=>{
+      state[id]=id==='borderWidth'?Number(el.value):el.value;
+      render();
+    });
+  }
+}
+
+const bgGradientEl = $('bgGradient');
+if (bgGradientEl) {
+  bgGradientEl.addEventListener('change', () => {
+    state.bgGradient = bgGradientEl.value;
+    updateBg2Visibility();
+    render();
+  });
+}
+
+$('tracks').addEventListener('input',()=>{
+  state.tracks=$('tracks').value.split('\n').map(t=>t.trim()).filter(Boolean);
+  render();
+});
+
+$('dpi').addEventListener('change',render);
+
+$('theme').addEventListener('change',()=>{
+  state.theme=$('theme').value;
+  state.background=state.theme==='light'?'#f3f0e7':state.palette[0];
+  state.background2=state.theme==='light'?'#e2dcd0':'#080808';
+  state.textColor=state.theme==='light'?'#222822':'#fff9ef';
+  state.borderColor=state.theme==='light'?'#222822':state.palette[4];
+  syncFields();
+  render();
+});
+
+const palettePresetEl = $('palettePreset');
+if (palettePresetEl) {
+  palettePresetEl.addEventListener('change', () => {
+    const val = palettePresetEl.value;
+    if (val === 'extract' && artImage) {
+      state.palette = extractPalette(artImage);
+      state.background = state.theme === 'dark' ? state.palette[0] : '#f3f0e7';
+      state.background2 = state.theme === 'dark' ? (state.palette[1] || '#080808') : '#e2dcd0';
+      state.borderColor = state.theme === 'dark' ? state.palette[4] : '#222822';
+    } else if (THEMES[val]) {
+      const t = THEMES[val];
+      state.palette = [...t.palette];
+      state.background = t.bg;
+      state.background2 = t.palette[1] || (state.theme === 'dark' ? '#080808' : '#e2dcd0');
+      state.textColor = t.text;
+      state.borderColor = t.border;
+    }
+    syncFields();
+    render();
+  });
+}
+
+const zoomToggle = $('zoomToggle');
+if (zoomToggle) {
+  zoomToggle.addEventListener('click', () => {
+    const isZoomed = document.body.classList.toggle('poster-zoomed');
+    zoomToggle.textContent = isZoomed ? 'Fit ⤡' : 'Zoom ⤢';
+  });
+}
+
+document.querySelectorAll('.preset-chip').forEach(chip => {
+  chip.addEventListener('click', () => loadPreset(chip.dataset.preset));
+});
+
+$('reset').addEventListener('click',reset);
+
+async function applyArt(file){
+  if(!file)return;
+  try{
+    if(!['image/png','image/jpeg','image/webp'].includes(file.type))throw new Error('Choose a PNG, JPEG, or WebP image.');
+    if(file.size>25*1024*1024)throw new Error('Choose an image under 25 MB.');
+    const data=await readFile(file);
+    const image=await loadImage(data);
+    if(image.naturalWidth*image.naturalHeight>100_000_000)throw new Error('Choose an image below 100 megapixels.');
+    state.artDataUrl=data;
+    state.artWidth=image.naturalWidth;
+    state.artHeight=image.naturalHeight;
+    artImage=image;
+    state.palette=extractPalette(image);
+    state.background=state.theme==='dark'?state.palette[0]:'#f3f0e7';
+    state.borderColor=state.theme==='dark'?state.palette[4]:'#222822';
+    $('rights').checked=false;
+    $('licenseNote').value='';
+    $('previewCaption').textContent='YOUR ARTWORK · PROCESSED ON THIS DEVICE';
+    document.querySelectorAll('.preset-chip').forEach(btn => btn.classList.remove('active'));
+    syncFields();
+    render();
+    status('artStatus',`${file.name} · ${image.naturalWidth} × ${image.naturalHeight} pixels. Colors extracted.`);
+  }catch(e){
+    status('artStatus',e.message,true);
+  }
+}
+
+$('artFile').addEventListener('change',e=>applyArt(e.target.files[0]));
+for(const ev of ['dragenter','dragover'])$('dropZone').addEventListener(ev,e=>{e.preventDefault();$('dropZone').classList.add('dragging');});
+for(const ev of ['dragleave','drop'])$('dropZone').addEventListener(ev,e=>{e.preventDefault();$('dropZone').classList.remove('dragging');if(ev==='drop')applyArt(e.dataTransfer.files[0]);});
+
+$('extract').addEventListener('click',()=>{
+  if (!artImage) return;
+  state.palette=extractPalette(artImage);
+  state.background=state.theme==='dark'?state.palette[0]:'#f3f0e7';
+  state.borderColor=state.theme==='dark'?state.palette[4]:'#222822';
+  syncFields();
+  render();
+});
+
+async function api(path){
+  if(location.protocol==='file:')throw new Error('Live search needs the local server. Run START-WINDOWS.cmd or npm start, then open http://127.0.0.1:3000. You can edit details and upload artwork here without it.');
+  const r=await fetch(path);
+  const body=await r.json();
+  if(!r.ok)throw new Error(body.error||'Lookup failed. Please try again.');
+  return body;
+}
+
+$('searchForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const rid=++requestId;
+  $('searchButton').disabled=true;
+  $('searchResults').replaceChildren();
+  status('searchStatus','Searching MusicBrainz…');
+  try{
+    const data=await api('/api/search?q='+encodeURIComponent($('query').value.trim()));
+    if(rid!==requestId)return;
+    status('searchStatus',data.results.length?`${data.results.length} albums found. Choose the right artist and edition.`:'No matches. Try the album title or artist separately.');
+    for(const album of data.results){
+      const button=document.createElement('button');
+      button.className='search-result';
+      const title=document.createElement('strong');
+      title.textContent=album.title;
+      const meta=document.createElement('span');
+      meta.textContent=[album.artist,album.date].filter(Boolean).join(' · ');
+      button.append(title,meta);
+      button.addEventListener('click',()=>selectAlbum(album.id));
+      $('searchResults').append(button);
+    }
+  }catch(e){
+    if(rid===requestId)status('searchStatus',e.message,true);
+  }finally{
+    if(rid===requestId)$('searchButton').disabled=false;
+  }
+});
+
+async function fetchArtworkDataUrl(imageUrl) {
+  const fetchUrl = location.protocol === 'file:' ? imageUrl : `/api/proxy-image?url=${encodeURIComponent(imageUrl)}`;
+  const img = await loadImage(fetchUrl);
+  const canvas = document.createElement('canvas');
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  return {
+    dataUrl: canvas.toDataURL('image/jpeg', 0.95),
+    width: img.naturalWidth,
+    height: img.naturalHeight,
+    img
+  };
+}
+
+async function applyPulledArtwork(imageUrl, sourceName) {
+  status('artStatus', `Downloading high-resolution artwork from ${sourceName}…`);
+  try {
+    const { dataUrl, width, height, img } = await fetchArtworkDataUrl(imageUrl);
+    state.artDataUrl = dataUrl;
+    state.artWidth = width;
+    state.artHeight = height;
+    artImage = img;
+    state.palette = extractPalette(img);
+    state.background = state.theme === 'dark' ? state.palette[0] : '#f3f0e7';
+    state.borderColor = state.theme === 'dark' ? state.palette[4] : '#222822';
+    $('rights').checked = true;
+    $('licenseNote').value = `High-resolution studio cover art via ${sourceName}.`;
+    $('previewCaption').textContent = `STUDIO ARTWORK · ${sourceName.toUpperCase()}`;
+    document.querySelectorAll('.preset-chip').forEach(btn => btn.classList.remove('active'));
+    syncFields();
+    render();
+    status('artStatus', `✓ High-resolution cover (${width} × ${height} px) pulled from ${sourceName}. Colors extracted.`);
+  } catch (err) {
+    status('artStatus', `Could not load artwork: ${err.message}`, true);
+  }
+}
+
+async function autoPullArtwork(query, releaseGroupId = '') {
+  const q = (query || `${state.artist} ${state.title}`).trim();
+  if (!q) {
+    status('artStatus', 'Enter an album title or artist to search artwork.', true);
+    return;
+  }
+  status('artStatus', `Searching high-resolution artwork for "${q}"…`);
+  try {
+    let results = [];
+    if (location.protocol === 'file:') {
+      const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=4`);
+      const data = await res.json();
+      for (const item of (data.results || [])) {
+        if (item.artworkUrl100) {
+          results.push({
+            source: 'Apple Music (3000px)',
+            title: item.collectionName,
+            artist: item.artistName,
+            url: item.artworkUrl100.replace(/\/\d+x\d+bb\.(jpg|png|webp)$/i, '/3000x3000bb.$1'),
+            thumb: item.artworkUrl100
+          });
+        }
+      }
+    } else {
+      const res = await api(`/api/artwork-search?q=${encodeURIComponent(q)}&id=${encodeURIComponent(releaseGroupId || '')}`);
+      results = res.results || [];
+    }
+    if (!results.length) {
+      status('artStatus', 'No studio artwork found. You can upload an image file directly.', true);
+      return;
+    }
+    await applyPulledArtwork(results[0].url, results[0].source);
+  } catch (err) {
+    status('artStatus', `Artwork lookup failed: ${err.message}`, true);
+  }
+}
+
+async function searchArtworkGallery(query, releaseGroupId = '') {
+  const gallery = $('artworkGallery');
+  const q = (query || `${state.artist} ${state.title}`).trim();
+  if (!q) return;
+  gallery.replaceChildren();
+  status('artStatus', `Searching covers for "${q}"…`);
+  try {
+    let results = [];
+    if (location.protocol === 'file:') {
+      const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=8`);
+      const data = await res.json();
+      for (const item of (data.results || [])) {
+        if (item.artworkUrl100) {
+          results.push({
+            source: 'Apple Music (3000px)',
+            title: item.collectionName,
+            artist: item.artistName,
+            url: item.artworkUrl100.replace(/\/\d+x\d+bb\.(jpg|png|webp)$/i, '/3000x3000bb.$1'),
+            thumb: item.artworkUrl100
+          });
+        }
+      }
+    } else {
+      const res = await api(`/api/artwork-search?q=${encodeURIComponent(q)}&id=${encodeURIComponent(releaseGroupId || '')}`);
+      results = res.results || [];
+    }
+    if (!results.length) {
+      const empty = document.createElement('div');
+      empty.className = 'hint';
+      empty.textContent = 'No covers found for this query.';
+      gallery.append(empty);
+      return;
+    }
+    for (const item of results) {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'artwork-card';
+      const img = document.createElement('img');
+      img.src = item.thumb || item.url;
+      img.alt = item.title;
+      img.loading = 'lazy';
+      const info = document.createElement('div');
+      info.className = 'artwork-card-info';
+      const title = document.createElement('strong');
+      title.textContent = item.title;
+      const artist = document.createElement('span');
+      artist.textContent = item.artist || item.source;
+      const badge = document.createElement('span');
+      badge.className = 'artwork-card-badge';
+      badge.textContent = item.source;
+      info.append(title, artist, badge);
+      card.append(img, info);
+      card.addEventListener('click', () => {
+        applyPulledArtwork(item.url, item.source);
+        $('artSearchBox').hidden = true;
+      });
+      gallery.append(card);
+    }
+    status('artStatus', `Found ${results.length} covers. Click any cover to apply it.`);
+  } catch (err) {
+    status('artStatus', `Search failed: ${err.message}`, true);
+  }
+}
+
+async function autoPullSpotifyCode(spotifyUrlOrUri) {
+  let target = (spotifyUrlOrUri || state.spotifyUrl || '').trim();
+  if (!target) {
+    status('codeStatus', 'Searching Spotify for this album…');
+    try {
+      const q = `${state.artist} ${state.title}`.trim();
+      if (location.protocol !== 'file:') {
+        const res = await api(`/api/spotify-search?q=${encodeURIComponent(q)}&id=${encodeURIComponent(state.releaseGroupId || '')}`);
+        if (res.found && (res.spotifyUrl || res.uri)) {
+          target = res.spotifyUrl || res.uri;
+          state.spotifyUrl = target;
+          if ($('spotifyUrl')) $('spotifyUrl').value = target;
+        }
+      }
+    } catch {}
+  }
+  if (!target) {
+    status('codeStatus', 'Could not auto-find Spotify link for this album. Paste a Spotify album link into the field above.', true);
+    return;
+  }
+  status('codeStatus', 'Pulling official Spotify Code from Spotify CDN…');
+  try {
+    let uri;
+    try { uri = spotifyUri(target); } catch {
+      if (/^spotify:album:[A-Za-z0-9]{22}$/.test(target)) uri = target;
+      else throw new Error('Enter a valid Spotify album link or URI.');
+    }
+    let dataUrl;
+    if (location.protocol === 'file:') {
+      const res = await fetch(`https://scannables.scdn.co/uri/plain/svg/000000/white/640/${encodeURIComponent(uri)}`);
+      if (!res.ok) throw new Error('Spotify returned error: ' + res.status);
+      const text = await res.text();
+      dataUrl = 'data:image/svg+xml;base64,' + utf8Base64(text);
+    } else {
+      const res = await api(`/api/spotify-code?uri=${encodeURIComponent(uri)}`);
+      dataUrl = res.dataUrl;
+    }
+    const img = await loadImage(dataUrl);
+    state.codeDataUrl = dataUrl;
+    state.codeWidth = img.naturalWidth || 640;
+    state.codeHeight = img.naturalHeight || 160;
+    $('codeConfirmed').checked = true;
+    $('removeCode').hidden = false;
+    render();
+    status('codeStatus', '✓ Official Spotify Code pulled directly from Spotify CDN.');
+  } catch (err) {
+    status('codeStatus', `Could not pull Spotify Code: ${err.message}`, true);
+  }
+}
+
+async function selectAlbum(id){
+  const rid=++requestId;
+  status('searchStatus','Loading the track list and release details…');
+  try{
+    const a=await api('/api/album?id='+encodeURIComponent(id));
+    if(rid!==requestId)return;
+    Object.assign(state,{
+      title:a.title,
+      artist:a.artist,
+      date:a.date,
+      label:a.label,
+      tracks:a.tracks.map(t=>t.title),
+      duration:formatDuration(a.durationMs),
+      spotifyUrl:a.spotifyUrl||'',
+      releaseGroupId: a.releaseGroupId || id,
+      codeDataUrl:''
+    });
+    $('codeConfirmed').checked=false;
+    $('removeCode').hidden=true;
+    $('metadataSource').href=a.sourceUrl;
+    $('metadataSource').hidden=false;
+    $('searchResults').replaceChildren();
+    document.querySelectorAll('.preset-chip').forEach(btn => btn.classList.remove('active'));
+    syncFields();
+    render();
+    status('codeStatus','');
+    status('searchStatus','Details loaded.');
+
+    // Auto-pull artwork and Spotify code in background
+    if (a.spotifyUrl) {
+      autoPullSpotifyCode(a.spotifyUrl).catch(() => {});
+    } else {
+      autoPullSpotifyCode().catch(() => {});
+    }
+    autoPullArtwork(`${a.artist} ${a.title}`, id).catch(() => {});
+  }catch(e){
+    if(rid===requestId)status('searchStatus',e.message,true);
+  }finally{
+    $('searchButton').disabled=false;
+  }
+}
+
+$('spotifyUrl').addEventListener('input',()=>{
+  state.spotifyUrl=$('spotifyUrl').value;
+  state.codeDataUrl='';
+  $('removeCode').hidden=true;
+  $('codeConfirmed').checked=false;
+  status('codeStatus','The destination changed. Pull or import a Code for this album.');
+  render();
+});
+
+const autoPullArtBtn = $('autoPullArtBtn');
+if (autoPullArtBtn) {
+  autoPullArtBtn.addEventListener('click', () => autoPullArtwork(`${state.artist} ${state.title}`, state.releaseGroupId));
+}
+
+const toggleArtSearchBtn = $('toggleArtSearchBtn');
+if (toggleArtSearchBtn) {
+  toggleArtSearchBtn.addEventListener('click', () => {
+    const box = $('artSearchBox');
+    box.hidden = !box.hidden;
+    if (!box.hidden) {
+      $('artQuery').value = `${state.artist} ${state.title}`.trim();
+      searchArtworkGallery($('artQuery').value, state.releaseGroupId);
+    }
+  });
+}
+
+const artSearchForm = $('artSearchForm');
+if (artSearchForm) {
+  artSearchForm.addEventListener('submit', e => {
+    e.preventDefault();
+    searchArtworkGallery($('artQuery').value.trim(), state.releaseGroupId);
+  });
+}
+
+const autoPullCodeBtn = $('autoPullCodeBtn');
+if (autoPullCodeBtn) {
+  autoPullCodeBtn.addEventListener('click', () => autoPullSpotifyCode($('spotifyUrl').value));
+}
+
+$('copyUri').addEventListener('click',async()=>{
+  try{
+    const uri=spotifyUri($('spotifyUrl').value);
+    await navigator.clipboard.writeText(uri);
+    status('codeStatus','URI copied. Paste it into the official generator, then import the download.');
+  }catch(e){
+    status('codeStatus',e.message,true);
+  }
+});
+
+function validateCodeSvg(text){
+  if(text.length>2_000_000)throw new Error('SVG Code is too large.');
+  const doc=new DOMParser().parseFromString(text,'image/svg+xml');
+  if(doc.querySelector('parsererror')||doc.documentElement.localName!=='svg')throw new Error('Not a valid SVG image.');
+  const allowed=new Set(['svg','g','path','rect','circle','ellipse','line','polyline','polygon','defs','clipPath','title','desc','use']);
+  for(const el of doc.querySelectorAll('*')){
+    if(!allowed.has(el.localName))throw new Error('This SVG contains unsupported active content. Import the PNG from Spotify instead.');
+    for(const a of el.attributes){
+      if(/^on/i.test(a.name)||/javascript:|https?:|data:|url\s*\(/i.test(a.value)&&!/^xmlns(?::xlink)?$/.test(a.name))throw new Error('The SVG must be self-contained with no scripts or external references.');
+      if(/(?:^|:)href$/.test(a.name)&&!/^#[\w.-]+$/.test(a.value))throw new Error('External SVG references are not allowed.');
+    }
+  }
+  return text;
+}
+
+$('codeFile').addEventListener('change',async e=>{
+  const file=e.target.files[0];
+  if(!file)return;
+  try{
+    spotifyUri($('spotifyUrl').value);
+    if(file.size>2_000_000)throw new Error('Choose a Code file under 2 MB.');
+    let data;
+    if(file.type==='image/svg+xml'||file.name.toLowerCase().endsWith('.svg'))data='data:image/svg+xml;base64,'+utf8Base64(validateCodeSvg(await file.text()));
+    else if(file.type==='image/png')data=await readFile(file);
+    else throw new Error('Import the SVG or PNG downloaded from Spotify Codes.');
+    const image=await loadImage(data);
+    if(image.naturalWidth/image.naturalHeight<2)throw new Error('Use the complete horizontal Code image, including its logo and rectangle.');
+    state.codeDataUrl=data;
+    state.codeWidth=image.naturalWidth;
+    state.codeHeight=image.naturalHeight;
+    $('codeConfirmed').checked=false;
+    $('removeCode').hidden=false;
+    render();
+    status('codeStatus','Code imported unchanged. Scan it in Spotify and verify the destination before exporting.');
+  }catch(e){
+    status('codeStatus',e.message,true);
+  }
+});
+
+$('removeCode').addEventListener('click',()=>{
+  state.codeDataUrl='';
+  $('codeConfirmed').checked=false;
+  $('removeCode').hidden=true;
+  $('codeFile').value='';
+  status('codeStatus','Code removed.');
+  render();
+});
+
+function exportAllowed(){
+  if(!$('rights').checked)throw new Error('Confirm you have the artwork rights before exporting. A checkbox does not grant a license.');
+  if(state.codeDataUrl&&!$('codeConfirmed').checked)throw new Error('Scan the imported Code with Spotify and confirm the album destination first.');
+  if(!render())throw new Error('Resolve the layout issue before exporting.');
+}
+
+const slug=()=>state.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60)||'album-poster';
+
+function download(blob,name){
+  const a=document.createElement('a');
+  const url=URL.createObjectURL(blob);
+  a.href=url;
+  a.download=name;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+
+$('exportSvg').addEventListener('click',()=>{
+  try{
+    exportAllowed();
+    download(new Blob([svg],{type:'image/svg+xml'}),`${slug()}-${state.size}.svg`);
+    status('exportStatus','SVG downloaded. Artwork is embedded; text and border stay vector.');
+  }catch(e){
+    status('exportStatus',e.message,true);
+  }
+});
+
+$('exportPng').addEventListener('click',async()=>{
+  let objectUrl;
+  try{
+    exportAllowed();
+    $('exportPng').disabled=true;
+    const exportSvg=svg,exportSize=state.size,exportName=slug();
+    const dpi=Number($('dpi').value);
+    const [w,h]=(exportSize==='A3'?[11.7,16.5]:exportSize.split('x').map(Number));
+    status('exportStatus',`Rendering ${Math.round(w*dpi)} × ${Math.round(h*dpi)} pixels…`);
+    await new Promise(r=>setTimeout(r,30));
+    objectUrl=URL.createObjectURL(new Blob([exportSvg],{type:'image/svg+xml'}));
+    const image=await loadImage(objectUrl);
+    const c=document.createElement('canvas');
+    c.width=Math.round(w*dpi);
+    c.height=Math.round(h*dpi);
+    const ctx=c.getContext('2d');
+    if(!ctx)throw new Error('Not enough memory. Try 150 DPI or a smaller print size.');
+    ctx.drawImage(image,0,0,c.width,c.height);
+    const blob=await new Promise(r=>c.toBlob(r,'image/png'));
+    if(!blob)throw new Error('Export exceeded browser memory. Try 150 DPI.');
+    download(await pngWithDpi(blob,dpi),`${exportName}-${exportSize}-${dpi}dpi.png`);
+    c.width=c.height=1;
+    status('exportStatus','PNG downloaded with print-resolution metadata. Source artwork detail is unchanged.');
+  }catch(e){
+    status('exportStatus',e.message,true);
+  }finally{
+    $('exportPng').disabled=false;
+    if(objectUrl)URL.revokeObjectURL(objectUrl);
+  }
+});
+
+$('printPdf').addEventListener('click',()=>{
+  try{
+    exportAllowed();
+    const win=window.open('','_blank');
+    if(!win)throw new Error('Allow pop-ups to open the print preview.');
+    const [w,h]=(state.size==='A3'?[11.7,16.5]:state.size.split('x'));
+    win.addEventListener('load',()=>win.requestAnimationFrame(()=>win.requestAnimationFrame(()=>win.print())),{once:true});
+    win.document.open();
+    win.document.write(`<!doctype html><html><head><title>Album poster — Print</title><style>@page{size:${w}in ${h}in;margin:0}html,body{margin:0;padding:0}svg{display:block;width:${w}in;height:${h}in}@media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}}</style></head><body>${svg}</body></html>`);
+    win.document.close();
+    status('exportStatus',`Choose Save as PDF, ${w} × ${h} inch paper, no margins, 100% scale, and background graphics. SVG is the exact-size alternative if your browser limits paper sizes.`);
+  }catch(e){
+    status('exportStatus',e.message,true);
+  }
+});
+
+reset().catch(e=>status('exportStatus',e.message,true));
+</script></head>
+<body>
+<header class="masthead"><a class="wordmark" href="#" aria-label="Sleeve home"><span class="record-icon">◉</span> sleeve<span class="wordmark-dot">.</span></a><span class="header-note">YOUR MUSIC. YOUR WALL.</span><span class="privacy"><i></i> Artwork stays on your device</span></header>
+<main><section class="intro"><div><div class="eyebrow">THE ALBUM POSTER STUDIO</div><h1>A record worth framing.</h1><p>Find the music. Bring the artwork. Make it yours.</p></div><div class="intro-note">Original layouts.<br>Print-sized exports.<br>Made for your collection.</div></section>
+<div class="workspace"><aside class="controls" aria-label="Poster controls">
+<section class="control-section"><div class="section-title"><span class="step">01</span><h2>Find your record</h2></div><div class="presets-block"><span class="presets-label">Sample inspiration:</span><div class="presets-row"><button type="button" class="preset-chip active" data-preset="slowOrbit">Slow Orbit</button><button type="button" class="preset-chip" data-preset="darkSide">Dark Side</button><button type="button" class="preset-chip" data-preset="kindOfBlue">Kind of Blue</button><button type="button" class="preset-chip" data-preset="discovery">Discovery</button><button type="button" class="preset-chip" data-preset="rumours">Rumours</button><button type="button" class="preset-chip" data-preset="okComputer">OK Computer</button></div></div><form id="searchForm"><label for="query">Album or artist</label><div class="search-row"><input id="query" placeholder="e.g. Life of a DON" minlength="2" maxlength="120" required><button id="searchButton" aria-label="Search albums" type="submit">↗</button></div></form><p class="hint">Metadata search by MusicBrainz. Automatically pulls 3000px artwork &amp; Spotify codes.</p><div id="searchStatus" class="status" role="status" aria-live="polite"></div><div id="searchResults" class="search-results"></div>
+<details><summary>Edit album details <span>+</span></summary><div class="fields"><label>Album title<input id="title" maxlength="180"></label><label>Artist<input id="artist" maxlength="180"></label><div class="two-col"><label>Release date<input id="date" maxlength="40"></label><label>Length<input id="duration" maxlength="25" placeholder="51:34"></label></div><label>Record label<input id="label" maxlength="100"></label><label>Track list <small>One title per line · up to 60</small><textarea id="tracks" rows="9"></textarea></label><a id="metadataSource" hidden target="_blank" rel="noopener noreferrer">View selected MusicBrainz edition ↗</a></div></details></section>
+
+<section class="control-section"><div class="section-title"><span class="step">02</span><h2>Bring your artwork</h2></div><div class="art-actions-row"><button id="autoPullArtBtn" class="primary auto-btn" type="button">⚡ Pull 3000px Art</button><button id="toggleArtSearchBtn" class="secondary" type="button">Search Covers ↗</button></div><div id="artSearchBox" class="art-search-box" hidden><form id="artSearchForm"><div class="search-row"><input id="artQuery" placeholder="Search Apple Music, CAA, Deezer..."><button id="artSearchSubmit" aria-label="Find artwork" type="submit">↗</button></div></form><div id="artworkGallery" class="artwork-gallery"></div></div><label class="upload-zone" id="dropZone" for="artFile"><span class="upload-icon">↑</span><strong>Drop your cover here</strong><span>or choose a file · PNG, JPG, WebP</span><input id="artFile" type="file" accept="image/png,image/jpeg,image/webp"></label><p class="hint">Use art you created, have permission to reproduce, or have verified is public domain. Buying an album does not grant artwork rights.</p><label class="check"><input id="rights" type="checkbox" checked><span>I have the rights needed to reproduce this artwork.</span></label><label class="quiet-label">Permission / source note <input id="licenseNote" maxlength="500" placeholder="Your artwork, license URL, or permission reference"></label><div id="artStatus" class="status" role="status"></div><div class="quality-row"><span>ARTWORK AT PRINT SIZE</span><strong id="ppi">—</strong></div><p class="hint" id="qualityHint"></p></section>
+
+<section class="control-section"><div class="section-title"><span class="step">03</span><h2>Set the mood</h2></div><div class="two-col"><label>Print size<select id="size"><option value="12x12">12 × 12 in (Square Vinyl)</option><option value="12x18">12 × 18 inches</option><option value="18x24" selected>18 × 24 inches</option><option value="24x36">24 × 36 inches</option><option value="A3">A3 (11.7 × 16.5 in)</option></select></label><label>Paper mood<select id="theme"><option value="dark">After hours</option><option value="light">Gallery cream</option></select></label></div><div class="two-col"><label>Typography style<select id="fontFamily"><option value="sans" selected>Modern Swiss (Sans)</option><option value="serif">Editorial (Serif)</option><option value="mono">Studio Archive (Mono)</option></select></label><label>Track columns<select id="columns"><option value="auto" selected>Auto (Balanced)</option><option value="1">1 Column</option><option value="2">2 Columns</option><option value="3">3 Columns</option></select></label></div><div class="two-col"><label>Artwork framing<select id="artFit"><option value="meet" selected>Fit (Full Artwork)</option><option value="slice">Fill (Square Crop)</option></select></label><label>Palette theme<select id="palettePreset"><option value="extract" selected>From Artwork</option><option value="warmVinyl">Warm Vinyl</option><option value="tokyoNeon">Tokyo Neon</option><option value="galleryCream">Gallery Cream</option><option value="obsidianGold">Obsidian & Gold</option><option value="nordicMist">Nordic Mist</option><option value="terracotta">Terracotta</option></select></label></div><div class="palette-heading"><label>Colors from your cover</label><button class="text-button" id="extract" type="button">Extract again ↻</button></div><div id="palette" class="palette"></div><div class="two-col color-row"><label>Background<input id="background" type="color" value="#14151a"></label><label>Text<input id="textColor" type="color" value="#ffffff"></label></div><div class="two-col color-row gradient-row"><label>Background style<select id="bgGradient"><option value="none" selected>Solid color</option><option value="linear-v">Vertical fade</option><option value="linear-d">Diagonal fade (45°)</option><option value="radial">Ambient spotlight (Soft Radial)</option><option value="palette">Cover palette blend</option><option value="duotone">Palette duotone</option></select></label><div id="bg2Group" hidden><label>Gradient 2nd color<input id="background2" type="color" value="#080808"></label></div></div><div class="border-control"><label for="borderWidth">Artwork border <output id="borderValue">8 px</output></label><div class="range-row"><input id="borderWidth" type="range" min="0" max="24" value="8"><input id="borderColor" aria-label="Border color" type="color" value="#ede6d5"></div></div></section>
+
+<section class="control-section"><div class="section-title"><span class="step">04</span><h2>Add a real Spotify Code</h2><span class="optional">OPTIONAL</span></div><label>Spotify album link or URI<input id="spotifyUrl" placeholder="https://open.spotify.com/album/…" maxlength="250"></label><div class="code-actions"><button id="autoPullCodeBtn" class="primary auto-btn" type="button">⚡ Auto-pull Code</button><button id="copyUri" class="secondary" type="button">Copy URI</button><a class="secondary" href="https://www.spotifycodes.com/" target="_blank" rel="noopener noreferrer">Official generator ↗</a></div><p class="hint">Auto-pull downloads the genuine Spotify Code directly from Spotify. Unmodified official asset.</p><label class="file-button">Import official Code<input id="codeFile" type="file" accept="image/svg+xml,image/png"></label><button id="removeCode" class="text-button" type="button" hidden>Remove Code</button><div id="codeStatus" class="status" role="status"></div><label class="check"><input id="codeConfirmed" type="checkbox"><span>I scanned this Code in Spotify and confirmed it opens the album above.</span></label><p class="notice">Spotify prohibits Codes on products sold. Adding a Code does not grant rights to the album art. <a href="https://www.spotifycodes.com/assets/Terms_and_Conditions_for_Spotify_Codes_2025_10_09.pdf" target="_blank" rel="noopener noreferrer">Read terms ↗</a></p></section>
+</aside>
+<section class="stage" aria-label="Live poster preview"><div class="stage-toolbar"><span><i></i> LIVE PREVIEW</span><div class="view-controls"><span id="sizeBadge">18 × 24 IN</span><button id="zoomToggle" type="button">Zoom ⤢</button><button id="reset" type="button">Reset demo ↻</button></div></div><div class="poster-wrap"><div id="poster" aria-label="Your poster"></div></div><div class="stage-caption"><span id="previewCaption">ORIGINAL DEMO ART · NO ALBUM ART INCLUDED</span><span>01 / 01</span></div><div class="export-panel"><div><h2>Ready for the wall.</h2><p id="exportDescription">Vector SVG, high-resolution PNG, or print to PDF.</p></div><div class="export-controls"><label class="dpi-label" for="dpi">PNG resolution<select id="dpi"><option value="150">150 DPI</option><option value="300" selected>300 DPI</option></select></label><button class="secondary" id="exportSvg" type="button">↓ SVG</button><button class="primary" id="exportPng" type="button">↓ PNG</button><button class="secondary" id="printPdf" type="button">Print / PDF</button></div><div id="exportStatus" class="status" role="status" aria-live="polite"></div></div></section></div>
+<footer><span>DESIGNED TO KEEP THE MUSIC CLOSE.</span><p>Artwork is processed locally and never uploaded. Album searches reach MusicBrainz through this server. This editor does not grant image licenses or guarantee legal clearance. Not affiliated with Spotify or any artist.</p></footer>
+</main></body></html>
